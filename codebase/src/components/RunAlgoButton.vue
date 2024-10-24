@@ -2,15 +2,13 @@
     <button @click="runAlgorithm">Run</button>
 </template>
   
-  <script>
-  export default {
-    methods: {
-      runAlgorithm() {
-        alert('Algorithm running!');
-      }
-    }
-  }
-  </script>
+<script setup lang="ts">
+import { ref } from 'vue';
+
+const runAlgorithm = () => {
+  alert('Algorithm running!');
+};
+</script>
   
   <style scoped>
   button {
