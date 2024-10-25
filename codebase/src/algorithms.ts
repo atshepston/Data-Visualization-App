@@ -6,7 +6,7 @@ import type { AdjacencyList, } from "./graph/types";
  * @param startNode is the label of the node from which the function starts the traversal
  * @returns a set consisting of the node labels in the order they were visited
  */
-export function bfsWithTrace(graph: AdjacencyList, source: string): Set<number> {
+export function bfsWithTrace(graph: AdjacencyList, source: string): number[] {
   const startNode = Number(source)
   const visited = new Set<number>();  // Track visited nodes
   const queue: number[] = [startNode];  // Queue for BFS traversal
@@ -23,7 +23,8 @@ export function bfsWithTrace(graph: AdjacencyList, source: string): Set<number> 
       const adjNodes = graph[curr];
       adjNodes.forEach(adjNode => queue.push(adjNode))
   }
-  return visited;
+  const result = Array.from(visited)
+  return result;
 }
 
 /**
@@ -33,7 +34,7 @@ export function bfsWithTrace(graph: AdjacencyList, source: string): Set<number> 
  * @returns a set consisting of the node labels in the order they were visited
  * contains a helper function to recursively run the dfs algorithm on all children of a node
  */
-export function dfsWithTrace(graph: AdjacencyList, source: number): Set<number> {
+export function dfsWithTrace(graph: AdjacencyList, source: string): number[] {
     const startNode = Number(source)
     const visited = new Set<number>(); // Track visited nodes
   
@@ -50,5 +51,6 @@ export function dfsWithTrace(graph: AdjacencyList, source: number): Set<number> 
     }
   
     dfs(startNode); // Start DFS from the source node
-    return visited;
+    const result = Array.from(visited)
+    return result;
   }
