@@ -18,6 +18,7 @@
         <!-- Visualize Bubble Sort (swapping numbers) -->
         <div class="numbers-container">
             <!-- will display all the numbers currently in the array -->
+             <!-- getStyle is called whenever array or positions is changed, will trigger the animation -->
             <div v-for="(number, index) in array"
                 :key="index"
                 class="number"
@@ -34,7 +35,7 @@
 
 
   <script setup lang="ts">
-    import { ref, defineEmits } from 'vue';
+    import { ref, defineEmits, nextTick } from 'vue';
     import { bubbleSort } from '../algorithms/bubble'; // Import the bubble sort function
  
  
@@ -43,22 +44,31 @@
  
  
     //let submittedValue = ref('');
+
+    let positionsHasChanged = ref(false);
+
     let inputValue = ref('');
-    let array = ref<number[]>([]); // create number array
- 
+    let array = ref<number[]>([]); // array for logical sort
+    let positions = ref<number[]>([]); // tracks the positions of numbers for animation
+
  
     // will build the array with user inputs
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // convert the input value to a number and push it into the array
         const number = parseFloat(inputValue.value); // converts input to a number
         if (!isNaN(number)) {
             array.value.push(number); // push the number into the array if it's valid
             positions.value.push(array.value.length - 1); // initialize position based on the index
+
+            positionsHasChanged.value = true; // Trigger animation
+            await nextTick(); // Wait for Vue to render
+            positionsHasChanged.value = false; // Reset after reactivity completes
         }
         inputValue.value = ''; // clear the input field after submission
     } 
 
     const clearArray = async () => {
+        positionsHasChanged.value = true;
         array.value  = []; // clears array
         positions.value = [];
         emit('sortedArray', array.value); // emit cleared array to parent 
@@ -66,14 +76,28 @@
  
     // sort array with bubble sort
     const sortArray = async () => {
+        positionsHasChanged.value = true;
         await bubbleSort(array.value, positions.value, 2000, updateSwap); // Call bubble sort with updateSwap callback
         emit('sortedArray', array.value); // emit sorted array to parent
     };
     // callback function to update the array and positions during the swap
-    const updateSwap = (newArray: number[], newPositions: number[]) => {
+    const updateSwap = (newArray: number[], newPositions: number[], posHasChanged: boolean) => {
+        positionsHasChanged.value = posHasChanged;
+        console.log("positionsHasChanged " + positionsHasChanged.value);
         array.value = newArray;
         positions.value = newPositions;
+        console.log("array and positions updated!");
     };
+
+    // const updatePositionSwap = (newPositions: number[]) => {
+    //     positions.value = newPositions;
+    // };
+    // const updateArraySwap = (newArray: number[]) => {
+    //     array.value = newArray;
+    // };
+
+
+
 
     // const sortArray = () => {
     //     //sorts a copy of the array (not the original array)
@@ -85,7 +109,6 @@
  
     // VISUALIZATION and ANIMATION
     let sortedIndex = ref(0); // tracks current index of the sort
-    let positions = ref<number[]>([]); // tracks the positions of numbers for animation
  
  
     // // function to get dynamic styles for animating positions
@@ -126,11 +149,15 @@
  
  
     const getStyle = (index: number) => {
+        console.log("positionsHasChanged: " + positionsHasChanged.value);
+        if(!positionsHasChanged.value) return {}
+
         const posIndex = positions.value[index];
         //calculates distance to shift the element
         //the elements current index is index
         //the target index (where it needs to move) is posIndex
         const distance = (posIndex - index) * 60; // 60px per position difference
+        //positionsHasChanged.value = false;
         console.log(`Moving element at index ${index} to position ${posIndex}, distance: ${distance}px`);
         return {
             //translateX moves the elements horizontally (along the x axis)

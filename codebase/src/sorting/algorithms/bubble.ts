@@ -49,7 +49,9 @@ export const bubbleSort = async (
     array: number[],
     positions: number[],
     delay: number,
-    updateSwap: (newArray: number[], newPositions: number[]) => void
+    updateSwap: (newArray: number[], newPositions: number[], posHasChanged: boolean) => void,
+    //updatePositionSwap: (newPositions: number[]) => void,
+    //updateArraySwap: (newArray: number[]) => void,
 ): Promise<number[]> => {
     for (let i = 0; i < array.length - 1; i++) {
         for (let j = 0; j < array.length - i - 1; j++) {
@@ -68,23 +70,24 @@ const swap = (
     a: number,
     b: number,
     delay: number,
-    updateSwap: (newArray: number[], newPositions: number[]) => void
+    updateSwap: (newArray: number[], newPositions: number[], posHasChanged: boolean) => void,
+    // updatePositionSwap: (newPositions: number[]) => void,
+    // updateArraySwap: (newArray: number[]) => void,
 ) => {
     return new Promise<void>((resolve) => {
         // first swap elements in the positions array 
-        //will cause the animations to trigger
-        //important for animations to trigger before updating the array
+        // will cause the animations to trigger
+        console.log("0. array: " + array + " and positions: " + positions);
         const tempPos = positions[a];
         positions[a] = positions[b];
         positions[b] = tempPos;
 
-        // update the array and positions arrays
-        //only positions array has been changed
-        //will trigger animation
-        updateSwap([...array], [...positions]);
+        // update the array and positions to trigger animation
+        updateSwap([...array], [...positions], true);
+        console.log("1. array: " + array + " and positions: " + positions);
 
         setTimeout(() => {
-            // swap elements in the array
+            // after animation, update data in actual array
             const temp = array[a];
             array[a] = array[b];
             array[b] = temp;
@@ -92,7 +95,8 @@ const swap = (
             // update the array and positions arrays
             // only "array" array has been changed
             // will NOT trigger animation because positions array has already been updated
-            updateSwap([...array], positions);
+            updateSwap([...array], positions, false);
+            console.log("2. array: " + array + " and positions: " + positions);
 
             resolve();
         }, delay);
