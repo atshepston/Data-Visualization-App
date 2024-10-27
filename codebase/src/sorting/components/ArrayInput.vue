@@ -17,12 +17,16 @@
  
         <!-- Visualize Bubble Sort (swapping numbers) -->
         <div class="numbers-container">
-            <!-- will display all the numbers currently in the array -->
-             <!-- getStyle is called whenever array or positions is changed, will trigger the animation -->
-            <div v-for="(number, index) in array"
-                :key="index"
-                class="number"
-                :style="getStyle(index)" 
+            <!-- display each number as a new div -->
+            <!-- number-div is will style each div -->
+            <div 
+                v-for="(number, index) in array" 
+                :key="index" 
+                class="number-div"
+                :style="{ 
+                    height: `${number*10}px`,
+                    backgroundColor: currentInnerIndex === index ? 'green' : '#007bff' 
+                }"
             >
                 {{ number }}
             </div>
@@ -41,15 +45,16 @@
  
     // defineEmits creates a custom event to pass sorted array to parent (main.vue)
     const emit = defineEmits(['sortedArray']);
- 
- 
-    //let submittedValue = ref('');
-
-    let positionsHasChanged = ref(false);
 
     let inputValue = ref('');
     let array = ref<number[]>([]); // array for logical sort
-    let positions = ref<number[]>([]); // tracks the positions of numbers for animation
+    
+    let currentInnerIndex = ref<number | null>(null);
+
+    const updateInnerIndex = (index: number | null) => {
+        currentInnerIndex.value = index;
+    };
+
 
  
     // will build the array with user inputs
@@ -58,114 +63,28 @@
         const number = parseFloat(inputValue.value); // converts input to a number
         if (!isNaN(number)) {
             array.value.push(number); // push the number into the array if it's valid
-            positions.value.push(array.value.length - 1); // initialize position based on the index
-
-            positionsHasChanged.value = true; // Trigger animation
-            await nextTick(); // Wait for Vue to render
-            positionsHasChanged.value = false; // Reset after reactivity completes
         }
         inputValue.value = ''; // clear the input field after submission
     } 
 
+    //when clear button is clicked, the array will be cleared
     const clearArray = async () => {
-        positionsHasChanged.value = true;
         array.value  = []; // clears array
-        positions.value = [];
         emit('sortedArray', array.value); // emit cleared array to parent 
     };
  
     // sort array with bubble sort
     const sortArray = async () => {
-        positionsHasChanged.value = true;
-        await bubbleSort(array.value, positions.value, 2000, updateSwap); // Call bubble sort with updateSwap callback
+        await bubbleSort(array.value, 1000, updateSwap, updateInnerIndex); // Call bubble sort with updateSwap callback
         emit('sortedArray', array.value); // emit sorted array to parent
     };
-    // callback function to update the array and positions during the swap
-    const updateSwap = (newArray: number[], newPositions: number[], posHasChanged: boolean) => {
-        positionsHasChanged.value = posHasChanged;
-        console.log("positionsHasChanged " + positionsHasChanged.value);
+
+    // callback function to update the array during the swap
+    const updateSwap = (newArray: number[]) => {
         array.value = newArray;
-        positions.value = newPositions;
-        console.log("array and positions updated!");
+        console.log("array updated!");
     };
-
-    // const updatePositionSwap = (newPositions: number[]) => {
-    //     positions.value = newPositions;
-    // };
-    // const updateArraySwap = (newArray: number[]) => {
-    //     array.value = newArray;
-    // };
-
-
-
-
-    // const sortArray = () => {
-    //     //sorts a copy of the array (not the original array)
-    //     let sorted = bubbleSort([...array.value], array.value.length);
-    //     //array.value = sorted;
-    //     emit('sortedArray', sorted); // Emit sorted array to App.vue
-    // }
  
- 
-    // VISUALIZATION and ANIMATION
-    let sortedIndex = ref(0); // tracks current index of the sort
- 
- 
-    // // function to get dynamic styles for animating positions
-    // // animation function for sorting
-    // const sortArray = async () => {
-    //     for (let i = 0; i < array.value.length - 1; i++) {
-    //         for (let j = 0; j < array.value.length - i - 1; j++) {
-    //             if (array.value[j] > array.value[j + 1]) {
-    //                 await swap(j, j + 1); // wait for the swap animation
-    //             }
-    //         }
-    //         sortedIndex.value = i + 1; // update sorted section after each pass
-    //     }
-    //     emit('sortedArray', array.value); // emit sorted array to App.vue
-    // };
- 
- 
-    // // helper function to animate swapping
-    // const swap = (a: number, b: number) => {
-    //     return new Promise<void>((resolve) => {
-    //         setTimeout(() => {
-    //             // swap the elements in the array itself
-    //             const temp = array.value[a];
-    //             array.value[a] = array.value[b];
-    //             array.value[b] = temp;
- 
- 
-    //             // swap the positions for the animation
-    //             const tempPos = positions.value[a];
-    //             positions.value[a] = positions.value[b];
-    //             positions.value[b] = tempPos;
- 
- 
-    //             resolve();
-    //         }, 1000); // Adjust the time for animation speed
-    //     });
-    // };
- 
- 
-    const getStyle = (index: number) => {
-        console.log("positionsHasChanged: " + positionsHasChanged.value);
-        if(!positionsHasChanged.value) return {}
-
-        const posIndex = positions.value[index];
-        //calculates distance to shift the element
-        //the elements current index is index
-        //the target index (where it needs to move) is posIndex
-        const distance = (posIndex - index) * 60; // 60px per position difference
-        //positionsHasChanged.value = false;
-        console.log(`Moving element at index ${index} to position ${posIndex}, distance: ${distance}px`);
-        return {
-            //translateX moves the elements horizontally (along the x axis)
-            transform: `translateX(${distance}px)`,
-            transition: 'transform 2s ease',
-        };
-    };
-    // VISUALIZATION and ANIMATION
  </script>
 
 
@@ -219,19 +138,21 @@
         justify-content: center; /* Center the numbers inside the container */
         gap: 10px;
         margin-top: 20px;
+        align-items: flex-end;
     }
- 
- 
-    .number {
-        font-size: 24px;
-        width: 50px;
-        height: 50px; /* Added height */
+
+    /* styling for number divs (bars) */
+    .number-div {
+        margin: 5px;
+        padding: 10px;
+        background-color: #007bff;
+        border: 1px solid #ccc;
+        color: white;
+        width: 5%;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: lightblue; /* Add background color */
-        border-radius: 5px; /* Optional: to make it look better */
-        transition: transform 2s ease;
+        align-items: center;   /* center numbers vertically */
+        justify-content: center; /* center numbers horizontally */
+        font-size: 14px;
     }
  </style>
  
