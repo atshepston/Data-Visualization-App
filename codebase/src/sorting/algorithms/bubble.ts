@@ -31,6 +31,7 @@ export const bubbleSort = async (
         }
         // Decrease sorted index
         sortedIndex--;
+        updateCurrentLines([6]);
         // Update sorted index
         updateSortedIndex(sortedIndex);
         // Visualization delay
@@ -60,7 +61,7 @@ const swap = (
     return new Promise<void>((resolve) => {
         setTimeout(() => {
             // Highlight "swap"
-            updateCurrentLines([4]);
+            updateCurrentLines([4, 5]);
             // Swap elements
             [array[a], array[b]] = [array[b], array[a]];
             updateSwap([...array]);

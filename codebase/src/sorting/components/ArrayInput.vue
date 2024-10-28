@@ -117,13 +117,13 @@ const handleSubmit = () => {
 
 // Function to clear the array
 const clearArray = () => {
+    reset();
     array.value = [];
     emit('sortedArray', array.value);
 };
 
 // Function to sort the array using bubble sort algorithm
 const sortArray = async () => {
-    reset();
     await bubbleSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
     emit('sortedArray', array.value);
 };
