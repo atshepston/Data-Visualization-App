@@ -209,9 +209,10 @@ button:hover {
 .pseudo-code-container {
     margin-top: 20px;
     background-color: #f7f9fc;
-    padding: 10px;
+    padding-right: 20%;
     border-radius: 8px;
-    width: 100%;
+    width: auto;
+    font-size: 14px;
 }
 
 /* Styles for highlighted pseudo code lines */
