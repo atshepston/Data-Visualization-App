@@ -1,16 +1,25 @@
 <template>
+    <!-- Main container for the array input component -->
     <div class="arrayInput">
+        <!-- Form container for input and add button -->
         <div class="form-container">
+            <!-- Form to handle number input and submission -->
             <form @submit.prevent="handleSubmit" class="form-styles">
+                <!-- Input field for entering numbers -->
                 <input v-model="inputValue" type="text" placeholder="Enter number" />
+                <!-- Button to add number to array -->
                 <button type="submit">Add</button>
             </form>
         </div>
 
+        <!-- Button to clear the array -->
         <button @click="clearArray">Clear</button>
+        <!-- Button to sort the array -->
         <button @click="sortArray">Sort</button>
 
+        <!-- Container to display the numbers in the array -->
         <div class="numbers-container">
+            <!-- Loop through the array and display each number -->
             <div 
                 v-for="(number, index) in array" 
                 :key="index" 
@@ -28,12 +37,15 @@
             </div>
         </div>
 
+        <!-- Container to display the pseudo code for the sorting algorithm -->
         <div class="pseudo-code-container">
+            <!-- Loop through the pseudo code lines and display each line -->
             <pre v-for="(line, index) in pseudoCode" :key="index" :class="{ highlighted: currentLines.includes(index) }">
                 {{ line }}
             </pre>
         </div>
 
+        <!-- Display the current state of the array -->
         <p>Array so far: {{ array }}</p>
     </div>
 </template>
@@ -42,15 +54,20 @@
 import { ref, defineEmits } from 'vue';
 import { bubbleSort } from '../algorithms/bubble';
 
+// Define custom event to emit sorted array
 const emit = defineEmits(['sortedArray']);
 
+// Reactive references for input value and array of numbers
 const inputValue = ref('');
 const array = ref<number[]>([]);
+
+// Reactive references for sorting state
 let currentLeftIndex = ref<number | null>(null);
 let currentRightIndex = ref<number | null>(null);
 const currentLines = ref<number[]>([]);
 const currentSortedIndex = ref<number | null>(null);
 
+// Pseudo code for the bubble sort algorithm
 const pseudoCode = ref([
     "do", // Line 0
     "    swapped = false", // Line 1
@@ -61,29 +78,35 @@ const pseudoCode = ref([
     "while swapped" // Line 6
 ]);
 
+// Function to update the left index during sorting
 const updateLeftIndex = (index: number | null) => {
     currentLeftIndex.value = index;
 };
 
+// Function to update the right index during sorting
 const updateRightIndex = (index: number | null) => {
     currentRightIndex.value = index;
 };
 
+// Function to update the current lines of pseudo code being highlighted
 const updateCurrentLines = (lines: number[]) => {
     currentLines.value = lines;
 };
 
+// Function to update the current sorted index
 const updateSortedIndex = (index: number | null) => {
     currentSortedIndex.value = index;
 };
 
-const reset = ()=> {
+// Function to reset the sorting state
+const reset = () => {
     currentLeftIndex.value = null;
     currentRightIndex.value = null;
     currentLines.value = [];
     currentSortedIndex.value = null;
-}
+};
 
+// Function to handle form submission and add number to array
 const handleSubmit = () => {
     const number = parseFloat(inputValue.value);
     if (!isNaN(number)) {
@@ -92,23 +115,27 @@ const handleSubmit = () => {
     inputValue.value = '';
 };
 
+// Function to clear the array
 const clearArray = () => {
     array.value = [];
     emit('sortedArray', array.value);
 };
 
+// Function to sort the array using bubble sort algorithm
 const sortArray = async () => {
     reset();
     await bubbleSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
     emit('sortedArray', array.value);
 };
 
+// Function to update the array after a swap during sorting
 const updateSwap = (newArray: number[]) => {
     array.value = newArray;
 };
 </script>
 
 <style scoped>
+/* Styles for the form container */
 .form-container {
     display: flex;
     justify-content: center;
@@ -117,6 +144,7 @@ const updateSwap = (newArray: number[]) => {
     padding: 10px;
 }
 
+/* Styles for the form */
 .form-styles {
     background-color: white;
     border-radius: 8px;
@@ -124,6 +152,7 @@ const updateSwap = (newArray: number[]) => {
     width: 200px;
 }
 
+/* Styles for buttons */
 button {
     padding: 4px;
     background-color: #007bff;
@@ -136,10 +165,12 @@ button {
     margin-left: 5px;
 }
 
+/* Hover effect for buttons */
 button:hover {
     background-color: #0056b3;
 }
 
+/* Styles for the main array input container */
 .arrayInput {
     display: flex;
     gap: 10px;
@@ -150,6 +181,7 @@ button:hover {
     height: 100vh;
 }
 
+/* Styles for the numbers container */
 .numbers-container {
     display: flex;
     justify-content: center;
@@ -158,6 +190,7 @@ button:hover {
     align-items: flex-end;
 }
 
+/* Styles for each number div */
 .number-div {
     margin: 5px;
     padding: 10px;
@@ -172,6 +205,7 @@ button:hover {
     transition: background-color 0.3s, transform 0.3s;
 }
 
+/* Styles for the pseudo code container */
 .pseudo-code-container {
     margin-top: 20px;
     background-color: #f7f9fc;
@@ -180,18 +214,22 @@ button:hover {
     width: 100%;
 }
 
+/* Styles for highlighted pseudo code lines */
 .highlighted {
     background-color: yellow;
 }
 
+/* Styles for left index during sorting */
 .left-index {
     background-color: green !important;
 }
 
+/* Styles for right index during sorting */
 .right-index {
     background-color: green !important;
 }
 
+/* Styles for sorted index */
 .sorted-index {
     background-color: orange !important;
 }

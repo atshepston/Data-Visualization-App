@@ -5,42 +5,48 @@ export const bubbleSort = async (
     updateLeftIndex: (index: number | null) => void,
     updateRightIndex: (index: number | null) => void,
     updateCurrentLines: (lines: number[]) => void,
-    updateSortedIndex: (index: number | null) => void // Add this parameter
+    updateSortedIndex: (index: number | null) => void
 ): Promise<number[]> => {
     let swapped;
-    let sortedIndex = array.length; // Track the sorted elements
+    let sortedIndex = array.length;
     do {
-        updateCurrentLines([0]); // Highlight "do"
+        // Highlight "do"
+        updateCurrentLines([0]);
         swapped = false;
-        updateCurrentLines([1, 2]); // Highlight "swapped = false" and "for i = 1 to indexOfLastUnsortedElement-1"
+        // Highlight "swapped = false" and "for loop"
+        updateCurrentLines([1, 2]);
         for (let i = 0; i < sortedIndex - 1; i++) {
-            await delayExecution(delay); // Add delay for visualization
+            // Visualization delay
+            await delayExecution(delay);
+            updateLeftIndex(i);
+            updateRightIndex(i + 1);
             if (array[i] > array[i + 1]) {
-                updateCurrentLines([3]); // Highlight "if leftElement > rightElement"
-                updateLeftIndex(i);
-                updateRightIndex(i + 1);
+                // Highlight "if condition"
+                updateCurrentLines([3]);
                 await swap(array, i, i + 1, delay, updateSwap, updateCurrentLines);
-                updateCurrentLines([4, 5]); // Highlight "swap(leftElement, rightElement)" and "swapped = true;"
                 swapped = true;
-                await delayExecution(delay); // Add delay for visualization
-            } else {
-                updateCurrentLines([3]); // Highlight "if leftElement > rightElement"
-                updateLeftIndex(i);
-                updateRightIndex(i + 1);
-                await delayExecution(delay); // Add delay for visualization
             }
-            await delayExecution(delay); // Add delay for visualization
+            // Visualization delay
+            await delayExecution(delay);
         }
-        sortedIndex--; // Decrease the sorted index
-        updateSortedIndex(sortedIndex); // Update the sorted index
-        await delayExecution(delay); // Add delay for visualization
+        // Decrease sorted index
+        sortedIndex--;
+        // Update sorted index
+        updateSortedIndex(sortedIndex);
+        // Visualization delay
+        await delayExecution(delay);
     } while (swapped);
-    updateCurrentLines([6]); // Highlight "while swapped"
-    updateLeftIndex(null);   // reset after sorting
-    updateRightIndex(null);  // reset after sorting
-    await delayExecution(delay); // Add delay for visualization
-    updateCurrentLines([]); // reset after sorting
-    return array; // return sorted array
+    // Highlight "while condition"
+    updateCurrentLines([6]);
+    // Reset indices
+    updateLeftIndex(null);
+    updateRightIndex(null);
+    // Visualization delay
+    await delayExecution(delay);
+    // Reset highlights
+    updateCurrentLines([]);
+    // Return sorted array
+    return array;
 };
 
 const swap = (
@@ -53,12 +59,11 @@ const swap = (
 ) => {
     return new Promise<void>((resolve) => {
         setTimeout(() => {
-            updateCurrentLines([4]); // Highlight "swap(leftElement, rightElement)"
-            // update array
+            // Highlight "swap"
+            updateCurrentLines([4]);
+            // Swap elements
             [array[a], array[b]] = [array[b], array[a]];
-
             updateSwap([...array]);
-
             resolve();
         }, delay);
     });
