@@ -1,48 +1,40 @@
 <template>
     <div class="page">
         <h1>Array Sorting</h1>
-        <!-- when custom event,sortedArray, emitted from ArrayInput is triggered,
-        the function getSortedArray will be called -->
+        <!-- Call getSortedArray when the sortedArray event is emitted from ArrayInput -->
         <ArrayInput @sortedArray="getSortedArray" /> 
-        <p>Sorted Array: {{ sortedArray }}</p>
     </div>
 </template>
-  
+
 <script setup lang="ts">
-    import { ref } from 'vue';
-    import ArrayInput from './ArrayInput.vue'; // Import the ArrayInput component
+import { ref } from 'vue';
+import ArrayInput from './ArrayInput.vue'; // Import the ArrayInput component
 
-    let sortedArray = ref<number[]>([]); // Store the sorted array
+// Store the sorted array
+const sortedArray = ref<number[]>([]); 
 
-    // this function handles the event (sortedArray) from ArrayInput.vue
-    // bubble sorted array is passed as an argument
-    const getSortedArray = (sorted: number[]) => {
-        sortedArray.value = sorted; // Update the sorted array
-    };
+// Handle the sortedArray event from ArrayInput.vue
+const getSortedArray = (sorted: number[]) => {
+    // Update the sorted array
+    sortedArray.value = sorted; 
+};
 </script>
-  
+
 <style scoped>
-    .page {
-        width: 100%;
-        height: 100%;
-        background-color: white;
-        display: flex;
-        flex-direction: column; /* Stack items vertically */
-        align-items: center; /* Center items horizontally */
-        justify-content: center; /* Center items vertically */
-        padding: 20px; /* Add padding around the container */
-        box-sizing: border-box; /* Include padding in the width and height calculations */
-    }
-  /* div {
+.page {
     width: 100%;
     height: 100%;
-    background-color: rgb(0, 162, 255);
+    background-color: white;
     display: flex;
-    align-items: center;
-    justify-content: center;
-  } */
-  h1 {
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
+    padding: 20px; /* Add padding around the container */
+    box-sizing: border-box; /* Include padding in the width and height calculations */
+}
+
+h1 {
     margin: 0;
     color: black;
-  }
-  </style>
+}
+</style>
