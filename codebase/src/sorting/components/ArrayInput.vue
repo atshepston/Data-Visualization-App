@@ -109,9 +109,11 @@ const reset = () => {
 // Function to handle form submission and add number to array
 const handleSubmit = () => {
     array.value = [];
-    const number = inputValue.value.split(',').map((num) => parseInt(num.trim()));
-    number.forEach((num) => {
-        array.value.push(num);
+    const numbers = inputValue.value.split(',').map((num) => parseInt(num.trim()));
+    numbers.forEach((num) => {
+        if (!isNaN(num)) {
+            array.value.push(num);
+        }
     });
 };
 
