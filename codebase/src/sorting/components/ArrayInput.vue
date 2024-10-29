@@ -108,16 +108,15 @@ const reset = () => {
 
 // Function to handle form submission and add number to array
 const handleSubmit = () => {
-    const number = parseFloat(inputValue.value);
-    if (!isNaN(number)) {
-        array.value.push(number);
-    }
-    inputValue.value = '';
+    array.value = [];
+    const number = inputValue.value.split(',').map((num) => parseInt(num.trim()));
+    number.forEach((num) => {
+        array.value.push(num);
+    });
 };
 
 // Function to clear the array
 const clearArray = () => {
-    reset();
     array.value = [];
     emit('sortedArray', array.value);
 };
@@ -126,6 +125,7 @@ const clearArray = () => {
 const sortArray = async () => {
     await bubbleSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
     emit('sortedArray', array.value);
+    reset();
 };
 
 // Function to update the array after a swap during sorting
