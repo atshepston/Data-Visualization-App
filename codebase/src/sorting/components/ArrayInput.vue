@@ -120,6 +120,7 @@ const handleSubmit = () => {
 // Function to clear the array
 const clearArray = () => {
     array.value = [];
+    inputValue.value = '';
     emit('sortedArray', array.value);
 };
 
