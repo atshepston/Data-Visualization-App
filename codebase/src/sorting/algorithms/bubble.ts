@@ -50,7 +50,7 @@ export const bubbleSort = async (
     return array;
 };
 
-const swap = (
+export const swap = (
     array: number[],
     a: number,
     b: number,
@@ -70,7 +70,7 @@ const swap = (
     });
 };
 
-const delayExecution = (delay: number) => {
+export const delayExecution = (delay: number) => {
     return new Promise<void>((resolve) => {
         setTimeout(resolve, delay);
     });

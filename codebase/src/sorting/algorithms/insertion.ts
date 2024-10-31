@@ -1,29 +1,66 @@
-// Javascript program for insertion sort 
+import { swap, delayExecution } from "./bubble";
 
 // Function to sort array using insertion sort
-function insertionSort(arr: number[]) {
-    for (let i = 1; i < arr.length; i++) {
-        let key = arr[i];
-        let j = i - 1;
-
-        /* Move elements of arr[0..i-1], that are
-           greater than key, to one position ahead
-           of their current position */
-        while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
-            j = j - 1;
+export const insertionSort = async (
+    array: number[],
+    delay: number,
+    updateSwap: (newArray: number[]) => void,
+    updateLeftIndex: (index: number | null) => void,
+    updateRightIndex: (index: number | null) => void,
+    updateCurrentLines: (lines: number[]) => void,
+    updateSortedIndex: (index: number | null) => void
+): Promise<number[]> => {
+    let swapped;
+    let sortedIndex = array.length;
+    do {
+       // Highlight "do"
+       updateCurrentLines([0]);
+       swapped = false;
+       // Highlight "swapped = false" and "for loop"
+       updateCurrentLines([1, 2]);
+        for (let i = 1; i < sortedIndex; i++) {
+            // Visualization delay
+            await delayExecution(delay);
+            updateLeftIndex(i);
+            updateRightIndex(i - 1);
+            // let key = array[i];
+            // let j = i - 1;
+    
+            // /* Move elements of arr[0..i-1], that are
+            //    greater than key, to one position ahead
+            //    of their current position */
+            // while (j >= 0 && array[j] > key) {
+            //     array[j + 1] = array[j];
+            //     j = j - 1;
+            // }
+            // array[j + 1] = key;
+            let j = i - 1;
+            while(j >= 0){
+                if (array[j] > array[j+1]) {
+                    // Highlight "if condition"
+                    updateCurrentLines([3]);
+                    await swap(array, j+1, j, delay, updateSwap, updateCurrentLines);
+                    swapped = true;
+                    j = j - 1;
+                    updateLeftIndex(j); // j might be -1
+                    updateRightIndex(j+1);
+                }
+            }
+            // Visualization delay
+            await delayExecution(delay);
         }
-        arr[j + 1] = key;
-    }
+    } while(swapped);
+    // Highlight "while condition"
+    updateCurrentLines([6]);
+    // Reset indices
+    updateLeftIndex(null);
+    updateRightIndex(null);
+    // Visualization delay
+    await delayExecution(delay);
+    // Reset highlights
+    updateCurrentLines([]);
+    // Return sorted array
+    return array;
 }
 
-// A utility function to print array of size n
-function printInsertionArray(arr: number[]) {
-    console.log(arr.join(" "));
-}
 
-// Driver method
-// let arr = [12, 11, 13, 5, 6];
-
-// insertionSort(arr);
-// printArray(arr);
