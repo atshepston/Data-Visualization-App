@@ -53,6 +53,7 @@
 <script setup lang="ts">
 import { ref, defineEmits } from 'vue';
 import { bubbleSort } from '../algorithms/bubble';
+import { insertionSort } from '../algorithms/insertion';
 
 // Define custom event to emit sorted array
 const emit = defineEmits(['sortedArray']);
@@ -127,6 +128,8 @@ const clearArray = () => {
 // Function to sort the array using bubble sort algorithm
 const sortArray = async () => {
     await bubbleSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
+    //to visualize insertion sort, comment line above and uncomment line below...need to implement dropdown for algorithms
+    //await insertionSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
     emit('sortedArray', array.value);
     reset();
 };
