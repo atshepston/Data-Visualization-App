@@ -23,12 +23,15 @@ export const insertionSort = async (
             await delayExecution(delay);
             updateLeftIndex(i);
             updateRightIndex(i - 1);
-            
+
             let j = i - 1;
+            // Highlight "while left_element >=  0"
+            updateCurrentLines([3]);
             while(j >= 0){
+                updateCurrentLines([4]);
                 if (array[j] > array[j+1]) {
                     // Highlight "if condition"
-                    updateCurrentLines([3]);
+                    updateCurrentLines([5, 6]);
                     await swap(array, j+1, j, delay, updateSwap, updateCurrentLines);
                     swapped = true;
                     j = j - 1;
@@ -41,6 +44,7 @@ export const insertionSort = async (
                 }
             }
             // Visualization delay
+            updateCurrentLines([7]);
             await delayExecution(delay);
         }
     } while(swapped);

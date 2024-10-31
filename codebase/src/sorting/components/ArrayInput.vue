@@ -79,6 +79,19 @@ const pseudoCode = ref([
     "while swapped" // Line 6
 ]);
 
+// Pseudo code for the insertion sort algorithm
+const pseudoCodeInsertion = ref([
+    "do", // Line 0
+    "    swapped = false", // Line 1
+    "    for index = 1 to index_of_last_unsorted_element - 1", // Line 2
+    "       while left_element >=  0", // Line 3
+    "           if left_element > right_element", // Line 4
+    "               swap(left_element, right_element)", // Line 5
+    "               swapped = true;", // Line 6
+    "while swapped" // Line 7
+]);
+
+
 // Function to update the left index during sorting
 const updateLeftIndex = (index: number | null) => {
     currentLeftIndex.value = index;
