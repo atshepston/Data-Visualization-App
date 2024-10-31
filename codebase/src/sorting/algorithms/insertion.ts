@@ -23,17 +23,7 @@ export const insertionSort = async (
             await delayExecution(delay);
             updateLeftIndex(i);
             updateRightIndex(i - 1);
-            // let key = array[i];
-            // let j = i - 1;
-    
-            // /* Move elements of arr[0..i-1], that are
-            //    greater than key, to one position ahead
-            //    of their current position */
-            // while (j >= 0 && array[j] > key) {
-            //     array[j + 1] = array[j];
-            //     j = j - 1;
-            // }
-            // array[j + 1] = key;
+            
             let j = i - 1;
             while(j >= 0){
                 if (array[j] > array[j+1]) {
@@ -42,8 +32,12 @@ export const insertionSort = async (
                     await swap(array, j+1, j, delay, updateSwap, updateCurrentLines);
                     swapped = true;
                     j = j - 1;
+                    await delayExecution(delay);
                     updateLeftIndex(j); // j might be -1
                     updateRightIndex(j+1);
+                }
+                else{
+                    j = j - 1;
                 }
             }
             // Visualization delay
