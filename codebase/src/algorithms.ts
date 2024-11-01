@@ -3,8 +3,8 @@ import type { AdjacencyList } from "./graph/types";
 /**
  *
  * @param graph in the form of an adjacency list
- * @param startNode is the label of the node from which the function starts the traversal
- * @returns a set consisting of the node labels in the order they were visited
+ * @param startNode is the id of the node from which the function starts the traversal
+ * @returns an array of numbers consisting of the node ids in the order they were visited
  */
 export function bfsWithTrace(graph: AdjacencyList, source: number): number[] {
   const visited: number[] = []; // Track visited nodes
@@ -28,8 +28,8 @@ export function bfsWithTrace(graph: AdjacencyList, source: number): number[] {
 /**
  *
  * @param graph in the form of an adjacency list
- * @param startNode is the label of the node from which the function starts the traversal
- * @returns a set consisting of the node labels in the order they were visited
+ * @param startNode is the id of the node from which the function starts the traversal
+ * @returns an array of numbers consisting of the node ids in the order they were visited
  * contains a helper function to recursively run the dfs algorithm on all children of a node
  */
 export function dfsWithTrace(graph: AdjacencyList, source: string): number[] {

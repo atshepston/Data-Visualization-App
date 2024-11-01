@@ -29,10 +29,13 @@ export function graphToAdjList(nodes: GNode[], edges: GEdge[]): AdjacencyList {
  * @param adjList a previously constructed Adjacency List
  * @returns an object containing an array of edges and an array of nodes given adjList
  */
-export function adjListToGraph(adjList: AdjacencyList): Object {
+export function adjListToGraph(adjList: AdjacencyList): {
+  nodes: GNode[];
+  edges: GEdge[];
+} {
   const nodes = Object.keys(adjList).map((id) => ({ id: Number(id) } as GNode));
   const edges = Object.entries(adjList).flatMap(([from, tos]) =>
-    tos.map((to) => ({ from: Number(from), to: to }))
+    tos.map((to) => ({ from: Number(from), to: to } as GEdge))
   );
 
   return { nodes, edges };
