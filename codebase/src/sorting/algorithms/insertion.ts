@@ -1,7 +1,7 @@
 import { swap, delay } from "./bubble";
 
 // Function to sort array using insertion sort
-export const insertionSort = async (
+export const insertionSort = async ( { array, ms, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex }: {
     array: number[],
     ms: number,
     updateSwap: (newArray: number[]) => void,
@@ -9,7 +9,7 @@ export const insertionSort = async (
     updateRightIndex: (index: number | null) => void,
     updateCurrentLines: (lines: number[]) => void,
     updateSortedIndex: (index: number | null) => void
-): Promise<number[]> => {
+}): Promise<number[]> => {
     let swapped;
     let sortedIndex = array.length;
     do {

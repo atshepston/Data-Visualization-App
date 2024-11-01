@@ -140,9 +140,25 @@ const clearArray = () => {
 
 // Function to sort the array using bubble sort algorithm
 const sortArray = async () => {
-    await bubbleSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
+    await bubbleSort({
+        array: array.value, 
+        ms: 500,
+        updateSwap: updateSwap, 
+        updateLeftIndex: updateLeftIndex, 
+        updateRightIndex: updateRightIndex, 
+        updateCurrentLines: updateCurrentLines, 
+        updateSortedIndex: updateSortedIndex
+    });
     //to visualize insertion sort, comment line above and uncomment line below...need to implement dropdown for algorithms
-    //await insertionSort(array.value, 500, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex);
+    // await insertionSort({
+    //     array: array.value, 
+    //     ms: 500,
+    //     updateSwap: updateSwap, 
+    //     updateLeftIndex: updateLeftIndex, 
+    //     updateRightIndex: updateRightIndex, 
+    //     updateCurrentLines: updateCurrentLines, 
+    //     updateSortedIndex: updateSortedIndex
+    // });
     emit('sortedArray', array.value);
     reset();
 };

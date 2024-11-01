@@ -1,4 +1,4 @@
-export const bubbleSort = async (
+export const bubbleSort = async ( { array, ms, updateSwap, updateLeftIndex, updateRightIndex, updateCurrentLines, updateSortedIndex }: {
     array: number[],
     ms: number,
     updateSwap: (newArray: number[]) => void,
@@ -6,7 +6,7 @@ export const bubbleSort = async (
     updateRightIndex: (index: number | null) => void,
     updateCurrentLines: (lines: number[]) => void,
     updateSortedIndex: (index: number | null) => void
-): Promise<number[]> => {
+}): Promise<number[]> => {
     let swapped;
     let sortedIndex = array.length;
     do {
