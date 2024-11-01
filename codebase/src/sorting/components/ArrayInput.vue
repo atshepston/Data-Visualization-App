@@ -42,7 +42,7 @@
     <div class="pseudo-code-container">
       <!-- Loop through the pseudo code lines and display each line -->
       <pre
-        v-for="(line, index) in pseudoCode"
+        v-for="(line, index) in bubbleSortPseudoCode"
         :key="index"
         :class="{ highlighted: currentLines.includes(index) }"
       >
@@ -91,9 +91,7 @@ const bubbleSortPseudoCode = `do
         if left_element > right_element
             swap(left_element, right_element)
             swapped = true;
-while swapped`
-  .split("\n")
-  .map((line) => line.trim());
+while swapped`.split("\n");
 
 const insertionSortPseudoCode = `do
     swapped = false
@@ -102,9 +100,7 @@ const insertionSortPseudoCode = `do
            if left_element > right_element
                swap(left_element, right_element)
                swapped = true;
-while swapped`
-  .split("\n")
-  .map((line) => line.trim());
+while swapped`.split("\n");
 
 // Function to update the left index during sorting
 const updateLeftIndex = (index: number | null) => {
