@@ -62,7 +62,9 @@ import { bubbleSort } from "../algorithms/bubble";
 import { insertionSort } from "../algorithms/insertion";
 
 // Define custom event to emit sorted array
-const emit = defineEmits(["sortedArray"]);
+const emit = defineEmits<{
+  (event: "sortedArray", value: number[]): void;
+}>();
 
 // Reactive references for input value and array of numbers
 const inputValue = ref("");
