@@ -79,6 +79,14 @@ const pseudoCode = ref([
     "while swapped" // Line 6
 ]);
 
+const bubbleSortPseudoCode = `do
+    swapped = false
+    for index = 1 to index_of_last_unsorted_element - 1
+        if left_element > right_element
+            swap(left_element, right_element)
+            swapped = true;
+while swapped`.split('\n').map(line => line.trim());
+
 const insertionSortPseudoCode = `do
     swapped = false
     for index = 1 to index_of_last_unsorted_element - 1
