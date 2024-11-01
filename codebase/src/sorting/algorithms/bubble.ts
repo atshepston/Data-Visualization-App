@@ -1,6 +1,6 @@
 export const bubbleSort = async (
     array: number[],
-    delay: number,
+    ms: number,
     updateSwap: (newArray: number[]) => void,
     updateLeftIndex: (index: number | null) => void,
     updateRightIndex: (index: number | null) => void,
@@ -17,17 +17,17 @@ export const bubbleSort = async (
         updateCurrentLines([1, 2]);
         for (let i = 0; i < sortedIndex - 1; i++) {
             // Visualization delay
-            await delayExecution(delay);
+            await delay(ms);
             updateLeftIndex(i);
             updateRightIndex(i + 1);
             if (array[i] > array[i + 1]) {
                 // Highlight "if condition"
                 updateCurrentLines([3]);
-                await swap(array, i, i + 1, delay, updateSwap, updateCurrentLines);
+                await swap(array, i, i + 1, ms, updateSwap, updateCurrentLines);
                 swapped = true;
             }
             // Visualization delay
-            await delayExecution(delay);
+            await delay(ms);
         }
         // Decrease sorted index
         sortedIndex--;
@@ -35,7 +35,7 @@ export const bubbleSort = async (
         // Update sorted index
         updateSortedIndex(sortedIndex);
         // Visualization delay
-        await delayExecution(delay);
+        await delay(ms);
     } while (swapped);
     // Highlight "while condition"
     updateCurrentLines([6]);
@@ -43,7 +43,7 @@ export const bubbleSort = async (
     updateLeftIndex(null);
     updateRightIndex(null);
     // Visualization delay
-    await delayExecution(delay);
+    await delay(ms);
     // Reset highlights
     updateCurrentLines([]);
     // Return sorted array
@@ -54,7 +54,7 @@ export const swap = (
     array: number[],
     a: number,
     b: number,
-    delay: number,
+    ms: number,
     updateSwap: (newArray: number[]) => void,
     updateCurrentLines: (lines: number[]) => void
 ) => {
@@ -66,12 +66,8 @@ export const swap = (
             [array[a], array[b]] = [array[b], array[a]];
             updateSwap([...array]);
             resolve();
-        }, delay);
+        }, ms);
     });
 };
 
-export const delayExecution = (delay: number) => {
-    return new Promise<void>((resolve) => {
-        setTimeout(resolve, delay);
-    });
-};
+export const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
