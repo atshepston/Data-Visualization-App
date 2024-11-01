@@ -1,9 +1,9 @@
-import { swap, delayExecution } from "./bubble";
+import { swap, delay } from "./bubble";
 
 // Function to sort array using insertion sort
 export const insertionSort = async (
     array: number[],
-    delay: number,
+    ms: number,
     updateSwap: (newArray: number[]) => void,
     updateLeftIndex: (index: number | null) => void,
     updateRightIndex: (index: number | null) => void,
@@ -20,7 +20,7 @@ export const insertionSort = async (
        updateCurrentLines([1, 2]);
         for (let i = 1; i < sortedIndex; i++) {
             // Visualization delay
-            await delayExecution(delay);
+            await delay(ms);
             updateLeftIndex(i);
             updateRightIndex(i - 1);
 
@@ -32,10 +32,10 @@ export const insertionSort = async (
                 if (array[j] > array[j+1]) {
                     // Highlight "if condition"
                     updateCurrentLines([5, 6]);
-                    await swap(array, j+1, j, delay, updateSwap, updateCurrentLines);
+                    await swap(array, j+1, j, ms, updateSwap, updateCurrentLines);
                     swapped = true;
                     j = j - 1;
-                    await delayExecution(delay);
+                    await delay(ms);
                     updateLeftIndex(j); // j might be -1
                     updateRightIndex(j+1);
                 }
@@ -45,7 +45,7 @@ export const insertionSort = async (
             }
             // Visualization delay
             updateCurrentLines([7]);
-            await delayExecution(delay);
+            await delay(ms);
         }
     } while(swapped);
     // Highlight "while condition"
@@ -54,7 +54,7 @@ export const insertionSort = async (
     updateLeftIndex(null);
     updateRightIndex(null);
     // Visualization delay
-    await delayExecution(delay);
+    await delay(ms);
     // Reset highlights
     updateCurrentLines([]);
     // Return sorted array
