@@ -14,32 +14,33 @@ const selected = ref<string[]>([]);
 const edges = ref<GEdge[]>([]);
 
 const canvas = ref<HTMLCanvasElement>();
-let isDragging = false;
+let isDragging = -1;
 
 onMounted(() => {
   if (!canvas.value) {
     return;
   }
   canvas.value.addEventListener("dblclick", handleClick);
-  canvas.value.addEventListener("mousedown", () => {
-    isDragging = true;
-  });
+  canvas.value.addEventListener("mousedown", handleMouseDown);
   canvas.value.addEventListener("mouseup", () => {
-    isDragging = false;
+    isDragging = -1;
   });
   canvas.value.addEventListener("mousemove", handleDrag);
 });
 
+function handleMouseDown(event: MouseEvent) {
+  let index = isIntersectingIndex(event.offsetX, event.offsetY);
+  if (index != -1) {
+    isDragging = index;
+  }
+}
+
 //Need to optimize this better
 function handleDrag(event: MouseEvent) {
-  if (isDragging) {
-    const coordinates: number[] = [event.offsetX, event.offsetY];
-    let index = isIntersectingIndex(coordinates[0], coordinates[1]);
-    if (index != -1) {
-      nodes.value[index].x = coordinates[0];
-      nodes.value[index].y = coordinates[1];
-      redraw();
-    }
+  if (isDragging != -1) {
+    nodes.value[isDragging].x = event.offsetX;
+    nodes.value[isDragging].y = event.offsetY;
+    redraw();
   }
 }
 

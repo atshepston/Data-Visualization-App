@@ -7,6 +7,23 @@ export function drawEdges(nodes: Gnode[], edges: GEdge[]) {
 		for (let i = 0; i < edges.length; i++) {
 			let to: string = edges[i].to;
 			let from: string = edges[i].from;
+
+			if (to == from) {
+				let nodeCords: number[] = [];
+				for (let x = 0; x < nodes.length; x++) {
+					let cur = nodes[x];
+					if (cur.id == to) {
+						nodeCords = [cur.x, cur.y];
+					}
+				}
+				// Finish this!!
+				ctx.beginPath();
+				ctx.arc(nodeCords[0], nodeCords[1] + 30, 30, 0, 2 * Math.PI)
+				ctx.stroke()
+				return;
+			}
+
+
 			let toCords: number[] = [];
 			let fromCords: number[] = [];
 			for (let x = 0; x < nodes.length; x++) {
