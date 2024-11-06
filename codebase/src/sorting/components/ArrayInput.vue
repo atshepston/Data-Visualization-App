@@ -1,7 +1,7 @@
 <template>
-  <div class="arrayInput">
-    <p class="array-update">Array so far: {{ array }}</p>
-    <div class="form-container">
+  <div class="array-input-container">
+    <p class="array-display-text">Array so far: {{ array }}</p>
+    <div class="input-form-container">
       <form @submit.prevent="handleSubmit" class="form-styles">
         <input v-model="inputValue" type="text" placeholder="Enter number" />
         <button type="submit">Add</button>
@@ -9,14 +9,14 @@
         <button type="button" @click="sortArray">Sort</button>
         <button type="button" @click="generateArray">Random</button>
       </form>
-      <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="error" class="error-message">{{ error }}</p>
     </div>
-    <div class="visualization-container">
-      <div class="numbers-container">
+    <div class="array-visualization-container">
+      <div class="array-bars-container">
         <div
           v-for="(number, index) in array"
           :key="index"
-          class="number-div"
+          class="array-bar"
           :class="{
             'left-index': index === currentLeftIndex,
             'right-index': index === currentRightIndex,
@@ -179,7 +179,7 @@ const updateSwap = (newArray: number[]) => {
 </script>
 
 <style scoped>
-.arrayInput {
+.array-input-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -187,7 +187,7 @@ const updateSwap = (newArray: number[]) => {
   box-sizing: border-box;
 }
 
-.form-container {
+.input-form-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -228,13 +228,13 @@ button {
   margin-left: 10px;
 }
 
-.error {
+.error-message {
   color: red;
   font-size: medium;
   margin-top: 10px;
 }
 
-.array-update {
+.array-display-text {
   font-size: 15px;
   font-family: monospace;
   text-align: center;
@@ -244,12 +244,12 @@ button:hover {
   background-color: #0056b3;
 }
 
-.visualization-container {
+.array-visualization-container {
   justify-content: center;
   align-items: center;
 }
 
-.numbers-container {
+.array-bars-container {
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -257,7 +257,7 @@ button:hover {
   height: 400px;
 }
 
-.number-div {
+.array-bar {
   margin: 5px;
   padding: 10px;
   background-color: #007bff;
