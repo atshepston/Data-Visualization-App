@@ -1,35 +1,23 @@
 import { test, expect } from "vitest";
 import type { GNode, GEdge } from "./graph/types";
-import { graphToAdjList, adjListToGraph } from "./converters";
+import { Status } from "./graph/types";
+import { graphToAdjList } from "./converters";
 
-function edgeConstructor(
-  id: number,
-  to: number,
-  from: number,
-  weight: number,
-  type: any
-): GEdge {
-  return { id: id, to: to, from: from, weight: weight, type: type };
-}
-function nodeConstructor(id: number, x: number, y: number): GNode {
-  return { id: id, x: x, y: y };
-}
+const node1 = { id: 1, x: 10, y: 10, status: Status.default };
+const node2 = { id: 2, x: 20, y: 20, status: Status.default };
+const node3 = { id: 3, x: 30, y: 30, status: Status.default };
+const node4 = { id: 4, x: 40, y: 40, status: Status.default };
+const node5 = { id: 5, x: 50, y: 50, status: Status.default };
 
-const node1 = nodeConstructor(1, 10, 10);
-const node2 = nodeConstructor(2, 20, 20);
-const node3 = nodeConstructor(3, 30, 30);
-const node4 = nodeConstructor(4, 40, 40);
-const node5 = nodeConstructor(5, 50, 50);
-
-const edge1 = edgeConstructor(1, 2, 1, 1, "undirected");
-const edge2 = edgeConstructor(2, 3, 2, 1, "undirected");
-const edge3 = edgeConstructor(3, 4, 1, 1, "undirected");
-const edge4 = edgeConstructor(4, 5, 4, 1, "undirected");
+const edge1 = { id: 1, to: 2, from: 1, weight: 1, type: "undirected" };
+const edge2 = { id: 2, to: 3, from: 2, weight: 1, type: "undirected" };
+const edge3 = { id: 3, to: 4, from: 1, weight: 1, type: "undirected" };
+const edge4 = { id: 4, to: 5, from: 4, weight: 1, type: "undirected" };
 
 const nodes = [node1, node2, node3, node4, node5];
-const edges = [edge1, edge2, edge3, edge4];
+const edges = [edge1, edge2, edge3, edge4] as GEdge[];
 
-test("Test basic execution", () => {
+test("Basic execution of conversion from nodes and edges to adjacency list", () => {
   const result = graphToAdjList(nodes, edges);
   expect(result).toStrictEqual({
     "1": [2, 4],
@@ -40,27 +28,27 @@ test("Test basic execution", () => {
   });
 });
 
-test("Testing both empty sets", () => {
+test("No nodes and edges should return empty adjacency list", () => {
   const result = graphToAdjList([], []);
   expect(result).toStrictEqual({});
 });
 
-test("Testing empty node set and random set of edges", () => {
+test("No nodes and random set of edges should return empty adjacency list", () => {
   const result = graphToAdjList([], edges);
   expect(result).toStrictEqual({});
 });
 
-test("Testing empty edge set and random set of nodes", () => {
+test("No edges and random set of nodes should return empty arrays for all nodes in adjList", () => {
   const result = graphToAdjList(nodes, []);
   expect(result).toStrictEqual({ "1": [], "2": [], "3": [], "4": [], "5": [] });
 });
 
-test("Testing directed graph", () => {
-  const edge1 = edgeConstructor(1, 2, 1, 1, "directed");
-  const edge2 = edgeConstructor(2, 2, 3, 1, "directed");
-  const edge3 = edgeConstructor(3, 4, 1, 1, "directed");
-  const edge4 = edgeConstructor(4, 5, 4, 1, "directed");
-  const edges = [edge1, edge2, edge3, edge4];
+test("Basic execution of conversion from nodes and edges to adjacency list with directed edges", () => {
+  const edge1 = { id: 1, to: 2, from: 1, weight: 1, type: "directed" };
+  const edge2 = { id: 2, to: 2, from: 3, weight: 1, type: "directed" };
+  const edge3 = { id: 3, to: 4, from: 1, weight: 1, type: "directed" };
+  const edge4 = { id: 4, to: 5, from: 4, weight: 1, type: "directed" };
+  const edges = [edge1, edge2, edge3, edge4] as GEdge[];
 
   const result = graphToAdjList(nodes, edges);
   const expected = { "1": [2, 4], "2": [], "3": [2], "4": [5], "5": [] };
