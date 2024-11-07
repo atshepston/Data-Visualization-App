@@ -20,11 +20,12 @@ onMounted(() => {
   if (!canvas.value) {
     return;
   }
-  canvas.value.addEventListener("dblclick", handleClick);
+  canvas.value.addEventListener("dblclick", handleDoubleClick);
   canvas.value.addEventListener("mousedown", handleMouseDown);
   canvas.value.addEventListener("mouseup", () => {
     isDragging = -1;
   });
+  canvas.value.addEventListener("click", handleClick);
   canvas.value.addEventListener("mousemove", handleDrag);
 });
 
@@ -45,6 +46,23 @@ function handleDrag(event: MouseEvent) {
 }
 
 function handleClick(event: MouseEvent) {
+  const coordinates: number[] = [event.offsetX, event.offsetY];
+  // If nothing is intersecting, add a new node
+  let index = isIntersectingIndex(coordinates[0], coordinates[1]);
+  if (index == -1) {
+    let newNode: Gnode = {
+      id: globalId.toString(),
+      x: coordinates[0],
+      y: coordinates[1],
+      status: Status.default,
+    };
+    globalId += 1;
+    nodes.value.push(newNode);
+    redraw();
+  }
+}
+
+function handleDoubleClick(event: MouseEvent) {
   const coordinates: number[] = [event.offsetX, event.offsetY];
   let index = isIntersectingIndex(coordinates[0], coordinates[1]);
   if (index != -1) {
@@ -70,18 +88,6 @@ function handleClick(event: MouseEvent) {
     redraw();
     return;
   }
-  // If nothing is intersecting, add a new node
-  else {
-    let newNode: Gnode = {
-      id: globalId.toString(),
-      x: coordinates[0],
-      y: coordinates[1],
-      status: Status.default,
-    };
-    globalId += 1;
-    nodes.value.push(newNode);
-    redraw();
-  }
 }
 
 function isIntersectingIndex(x: number, y: number) {
@@ -96,44 +102,14 @@ function isIntersectingIndex(x: number, y: number) {
   return -1;
 }
 
-//function isIntersecting(x: number, y: number) { for (let i = 0; i < globalId; i++) {
-//    let cur = nodes.value[i];
-//
-//    if ((x - cur.x) ** 2 + (y - cur.y) ** 2 <= nodeR ** 2) {
-//      nodes.value[i].status = Status.selected;
-//      selected.value.push(nodes.value[i].id);
-//      if (selected.value.length == 2) {
-//        edges.value.push({
-//          id: globalEdgeId.toString(),
-//          from: selected.value[0],
-//          to: selected.value[1],
-//          type: "undirected",
-//          weight: 1,
-//        });
-//        globalEdgeId += 1;
-//
-//        for (let i = 0; i < nodes.value.length; i++) {
-//          if ((nodes.value[i].status = Status.selected)) {
-//            nodes.value[i].status = Status.default;
-//          }
-//        }
-//        selected.value = [];
-//      }
-//
-//      redraw();
-//      return true;
-//    }
-//  }
-//
-//  return false;
-//}
-
 function redraw() {
   if (canvas.value) {
     const ctx = canvas.value.getContext("2d");
-    ctx?.clearRect(0, 0, canvas.value.width, canvas.value.height);
-    drawEdges(nodes.value, edges.value);
-    drawNodes(nodes.value, nodeR);
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.value.width, canvas.value.height);
+      drawEdges(ctx, nodes.value, edges.value);
+      drawNodes(ctx, nodes.value, nodeR);
+    }
   }
 }
 </script>

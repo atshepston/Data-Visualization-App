@@ -1,8 +1,6 @@
 import type { Gnode } from "../graph/types";
-export function drawNodes(nodes: Gnode[], r: number) {
-	const canvas: HTMLCanvasElement = document.getElementById("GraphArea") as HTMLCanvasElement;
-	const ctx = canvas.getContext("2d");
-	if (ctx != null) {
+export function drawNodes(ctx: CanvasRenderingContext2D, nodes: Gnode[], r: number) {
+	if (ctx) {
 		for (let i = 0; i < nodes.length; i++) {
 			let x = nodes[i].x;
 			let y = nodes[i].y;
