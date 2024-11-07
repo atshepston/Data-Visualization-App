@@ -38,7 +38,7 @@ export const selectionSort = async ({
       let j = i;
       // Highlight "while left_element >=  0"
       updateCurrentLines([3]);
-      while (j <= sortedIndex) {
+      while (j <= sortedIndex && swapped === false) {
         //find smallest element in unsorted section
         updateCurrentLines([4]);
         if (array[j] < array[i]) {
@@ -47,6 +47,7 @@ export const selectionSort = async ({
           await swap(array, i, j, ms, updateSwap, updateCurrentLines);
           swapped = true;
           await delay(ms);
+          updateLeftIndex(i + 1);
           //updateLeftIndex(j); // j might be -1
           //updateRightIndex(i);
         } else {
