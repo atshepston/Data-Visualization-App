@@ -38,7 +38,7 @@
         :key="index"
         :class="{ highlighted: currentLines.includes(index) }"
         :style="{
-          paddingLeft: `${(line.match(/^(\s*)/)?.[0].length || 0) * 2}vw`,
+          paddingLeft: `${(line.match(/^(\s*)/)?.[0].length || 0) * 20}px`,
         }"
       >
         {{ line.trim() }}
