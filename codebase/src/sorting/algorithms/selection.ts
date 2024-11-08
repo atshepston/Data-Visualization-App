@@ -18,51 +18,48 @@ export const selectionSort = async ({
   updateCurrentLines: (lines: number[]) => void;
   updateSortedIndex: (index: number | null) => void;
 }): Promise<number[]> => {
-  let swapped;
-  let sortedIndex = array.length;
-  do {
-    let curElem;
-    let minElem;
+  let sortedIndex = -1;
+  let minIndex;
 
-    // Highlight "do"
-    updateCurrentLines([0]);
-    swapped = false;
-    // Highlight "swapped = false" and "for loop"
-    updateCurrentLines([1, 2]);
-    for (let i = 0; i < sortedIndex; i++) {
-      // Visualization delay
-      await delay(ms);
-      updateLeftIndex(i);
-      //updateRightIndex(i + 1);
+  // Highlight "for index = 0 to index_of_last_unsorted_element - 1"
+  updateCurrentLines([0]);
 
-      let j = i;
-      // Highlight "while left_element >=  0"
-      updateCurrentLines([3]);
-      while (j <= sortedIndex && swapped === false) {
-        //find smallest element in unsorted section
-        updateCurrentLines([4]);
-        if (array[j] < array[i]) {
-          // Highlight "if condition"
-          updateCurrentLines([5, 6]);
-          await swap(array, i, j, ms, updateSwap, updateCurrentLines);
-          swapped = true;
-          await delay(ms);
-          updateLeftIndex(i + 1);
-          //updateLeftIndex(j); // j might be -1
-          //updateRightIndex(i);
-        } else {
-          j = j + 1;
-          updateRightIndex(j);
-        }
+  for (let i = 0; i < array.length; i++) {
+    //i represents the index of the current elements
+    // Visualization delay
+    await delay(ms);
+    updateLeftIndex(i);
+
+    minIndex = i;
+    // Find index of smallest element
+    // Highlight "find smallest unsorted element"
+    updateCurrentLines([1]);
+    for (let j = i; j < array.length; j++) {
+      if (array[j] < array[minIndex]) {
+        minIndex = j;
       }
-      // Visualization delay
-      updateCurrentLines([7]);
-      updateSortedIndex(j);
-      await delay(ms);
     }
-  } while (swapped);
-  // Highlight "while condition"
-  updateCurrentLines([6]);
+
+    // Visualization delay
+    await delay(ms);
+    updateRightIndex(minIndex);
+
+    // Highlight "find smallest unsorted element"
+    updateCurrentLines([2]);
+    await swap(array, i, minIndex, ms, updateSwap, updateCurrentLines);
+
+    // Visualization delay
+    await delay(ms);
+    updateLeftIndex(null);
+    updateRightIndex(null);
+
+    // Increase sorted index
+    sortedIndex++;
+    // Update sorted index
+    updateSortedIndex(sortedIndex);
+    // Visualization delay
+    await delay(ms);
+  }
   // Reset indices
   updateLeftIndex(null);
   updateRightIndex(null);
