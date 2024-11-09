@@ -134,7 +134,7 @@ while swapped`.split("\n");
     currentRightIndex.value = index;
   };
 
-  const updateCurrentLines = (lines: number[]) => {
+  const setHighlightedLines = (lines: number[]) => {
     currentLines.value = lines;
   };
 
@@ -186,7 +186,7 @@ while swapped`.split("\n");
       updateSwap: updateSwap,
       updateLeftIndex: updateLeftIndex,
       updateRightIndex: updateRightIndex,
-      updateCurrentLines: updateCurrentLines,
+      setHighlightedLines: setHighlightedLines,
       updateSortedIndex: updateSortedIndex,
     });
     // await insertionSort({
@@ -195,7 +195,7 @@ while swapped`.split("\n");
     //   updateSwap: updateSwap,
     //   updateLeftIndex: updateLeftIndex,
     //   updateRightIndex: updateRightIndex,
-    //   updateCurrentLines: updateCurrentLines,
+    //   setHighlightedLines: setHighlightedLines,
     // });
     // await selectionSort({
     //   array: array.value,
@@ -203,7 +203,7 @@ while swapped`.split("\n");
     //   updateSwap: updateSwap,
     //   updateLeftIndex: updateLeftIndex,
     //   updateRightIndex: updateRightIndex,
-    //   updateCurrentLines: updateCurrentLines,
+    //   setHighlightedLines: setHighlightedLines,
     //   updateSortedIndex: updateSortedIndex,
     // });
     emit("sortedArray", array.value);

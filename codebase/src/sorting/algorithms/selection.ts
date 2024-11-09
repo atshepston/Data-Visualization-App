@@ -1,4 +1,4 @@
-import { swap, delay } from "./bubble";
+import { swap, visualizationDelay } from "./bubble";
 
 // Function to sort array using insertion sort
 export const selectionSort = async ({
@@ -7,7 +7,7 @@ export const selectionSort = async ({
   updateSwap,
   updateLeftIndex,
   updateRightIndex,
-  updateCurrentLines,
+  setHighlightedLines,
   updateSortedIndex,
 }: {
   array: number[];
@@ -15,58 +15,59 @@ export const selectionSort = async ({
   updateSwap: (newArray: number[]) => void;
   updateLeftIndex: (index: number | null) => void;
   updateRightIndex: (index: number | null) => void;
-  updateCurrentLines: (lines: number[]) => void;
+  setHighlightedLines: (lines: number[]) => void;
   updateSortedIndex: (index: number | null) => void;
 }): Promise<number[]> => {
   let sortedIndex = -1;
   let minIndex;
 
   // Highlight "for index = 0 to index_of_last_unsorted_element - 1"
-  updateCurrentLines([0]);
+  setHighlightedLines([0]);
 
   for (let i = 0; i < array.length; i++) {
     //i represents the index of the current elements
-    // Visualization delay
-    await delay(ms);
+    await visualizationDelay(ms);
     updateLeftIndex(i);
 
     minIndex = i;
     // Find index of smallest element
     // Highlight "find smallest unsorted element"
-    updateCurrentLines([1]);
+    setHighlightedLines([1]);
     for (let j = i; j < array.length; j++) {
       if (array[j] < array[minIndex]) {
         minIndex = j;
       }
     }
 
-    // Visualization delay
-    await delay(ms);
+    await visualizationDelay(ms);
     updateRightIndex(minIndex);
 
     // Highlight "find smallest unsorted element"
-    updateCurrentLines([2]);
-    await swap(array, i, minIndex, ms, updateSwap, updateCurrentLines);
+    setHighlightedLines([2]);
+    await swap({
+      array: array,
+      a: i,
+      b: minIndex,
+      ms: ms,
+      updateSwap: updateSwap,
+      setHighlightedLines: setHighlightedLines,
+    });
 
-    // Visualization delay
-    await delay(ms);
+    await visualizationDelay(ms);
     updateLeftIndex(null);
     updateRightIndex(null);
 
-    // Increase sorted index
     sortedIndex++;
-    // Update sorted index
     updateSortedIndex(sortedIndex);
-    // Visualization delay
-    await delay(ms);
+    await visualizationDelay(ms);
   }
   // Reset indices
   updateLeftIndex(null);
   updateRightIndex(null);
-  // Visualization delay
-  await delay(ms);
+
+  await visualizationDelay(ms);
   // Reset highlights
-  updateCurrentLines([]);
+  setHighlightedLines([]);
   // Return sorted array
   return array;
 };
