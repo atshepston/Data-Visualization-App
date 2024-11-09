@@ -1,61 +1,59 @@
 export const bubbleSort = async ({
   array,
   ms,
-  updateSwap,
-  updateLeftIndex,
-  updateRightIndex,
-  setHighlightedLines,
-  updateSortedIndex,
+  ui,
 }: {
   array: number[];
   ms: number;
-  updateSwap: (newArray: number[]) => void;
-  updateLeftIndex: (index: number | null) => void;
-  updateRightIndex: (index: number | null) => void;
-  setHighlightedLines: (lines: number[]) => void;
-  updateSortedIndex: (index: number | null) => void;
+  ui: {
+    updateSwap: (newArray: number[]) => void;
+    updateLeftIndex: (index: number | null) => void;
+    updateRightIndex: (index: number | null) => void;
+    setHighlightedLines: (lines: number[]) => void;
+    updateSortedIndex: (index: number | null) => void;
+  };
 }): Promise<number[]> => {
   let swapped;
   let sortedIndex = array.length;
   do {
     // Highlight "do"
-    setHighlightedLines([0]);
+    ui.setHighlightedLines([0]);
     swapped = false;
     // Highlight "swapped = false" and "for loop"
-    setHighlightedLines([1, 2]);
+    ui.setHighlightedLines([1, 2]);
     for (let i = 0; i < sortedIndex - 1; i++) {
       await visualizationDelay(ms);
-      updateLeftIndex(i);
-      updateRightIndex(i + 1);
+      ui.updateLeftIndex(i);
+      ui.updateRightIndex(i + 1);
       if (array[i] > array[i + 1]) {
         // Highlight "if condition"
-        setHighlightedLines([3]);
+        ui.setHighlightedLines([3]);
         await swap({
           array: array,
           a: i,
           b: i + 1,
           ms: ms,
-          updateSwap: updateSwap,
-          setHighlightedLines: setHighlightedLines,
+          updateSwap: ui.updateSwap,
+          setHighlightedLines: ui.setHighlightedLines,
         });
         swapped = true;
       }
       await visualizationDelay(ms);
     }
     sortedIndex--;
-    setHighlightedLines([6]);
-    updateSortedIndex(sortedIndex);
+    ui.setHighlightedLines([6]);
+    ui.updateSortedIndex(sortedIndex);
     await visualizationDelay(ms);
   } while (swapped);
   // Highlight "while condition"
-  setHighlightedLines([6]);
+  ui.setHighlightedLines([6]);
   // Reset indices
-  updateLeftIndex(null);
-  updateRightIndex(null);
+  ui.updateLeftIndex(null);
+  ui.updateRightIndex(null);
 
   await visualizationDelay(ms);
   // Reset highlights
-  setHighlightedLines([]);
+  ui.setHighlightedLines([]);
   // Return sorted array
   return array;
 };

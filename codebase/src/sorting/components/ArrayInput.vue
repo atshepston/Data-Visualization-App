@@ -183,28 +183,34 @@ while swapped`.split("\n");
     await bubbleSort({
       array: array.value,
       ms: 500,
-      updateSwap: updateSwap,
-      updateLeftIndex: updateLeftIndex,
-      updateRightIndex: updateRightIndex,
-      setHighlightedLines: setHighlightedLines,
-      updateSortedIndex: updateSortedIndex,
+      ui: {
+        updateSwap: updateSwap,
+        updateLeftIndex: updateLeftIndex,
+        updateRightIndex: updateRightIndex,
+        setHighlightedLines: setHighlightedLines,
+        updateSortedIndex: updateSortedIndex,
+      },
     });
     // await insertionSort({
     //   array: array.value,
     //   ms: 500,
-    //   updateSwap: updateSwap,
-    //   updateLeftIndex: updateLeftIndex,
-    //   updateRightIndex: updateRightIndex,
-    //   setHighlightedLines: setHighlightedLines,
+    //   ui: {
+    //     updateSwap: updateSwap,
+    //     updateLeftIndex: updateLeftIndex,
+    //     updateRightIndex: updateRightIndex,
+    //     setHighlightedLines: setHighlightedLines,
+    //   },
     // });
     // await selectionSort({
     //   array: array.value,
     //   ms: 500,
-    //   updateSwap: updateSwap,
-    //   updateLeftIndex: updateLeftIndex,
-    //   updateRightIndex: updateRightIndex,
-    //   setHighlightedLines: setHighlightedLines,
-    //   updateSortedIndex: updateSortedIndex,
+    //   ui: {
+    //     updateSwap: updateSwap,
+    //     updateLeftIndex: updateLeftIndex,
+    //     updateRightIndex: updateRightIndex,
+    //     setHighlightedLines: setHighlightedLines,
+    //     updateSortedIndex: updateSortedIndex,
+    //   },
     // });
     emit("sortedArray", array.value);
     resetValue();
