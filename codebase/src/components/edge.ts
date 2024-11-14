@@ -1,15 +1,19 @@
 import type { GEdge, GNode } from "../graph/types";
 const CIRCLER = 30;
 
-export function drawEdges(ctx: CanvasRenderingContext2D, nodes: GNode[], edges: GEdge[]) {
+export function drawEdges(
+  ctx: CanvasRenderingContext2D,
+  nodes: GNode[],
+  edges: GEdge[]
+) {
   // Make this not hard coded
   //const canvas: HTMLCanvasElement = document.getElementById("GraphArea") as HTMLCanvasElement;
   //const ctx = canvas.getContext("2d");
   // Maybe optimize this using adjacency list later
   if (ctx) {
     for (let i = 0; i < edges.length; i++) {
-      let to: string = edges[i].to;
-      let from: string = edges[i].from;
+      let to: number = edges[i].to;
+      let from: number = edges[i].from;
 
       //Self Edge
       if (to == from) {
@@ -21,7 +25,14 @@ export function drawEdges(ctx: CanvasRenderingContext2D, nodes: GNode[], edges: 
           }
         }
         //Maybe make angle opposite to the average of all other angles for that node
-        drawSelfEdge(ctx, (Math.PI), nodeCords[0], nodeCords[1], CIRCLER, edges[i]);
+        drawSelfEdge(
+          ctx,
+          Math.PI,
+          nodeCords[0],
+          nodeCords[1],
+          CIRCLER,
+          edges[i]
+        );
         //drawSelfEdge(ctx, (Math.PI / 2), nodeCords[0], nodeCords[1], CIRCLER, edges[i]);
         continue;
       }
@@ -35,8 +46,7 @@ export function drawEdges(ctx: CanvasRenderingContext2D, nodes: GNode[], edges: 
         if (cur.id == to) {
           toX = cur.x;
           toY = cur.y;
-        }
-        else if (cur.id == from) {
+        } else if (cur.id == from) {
           fromX = cur.x;
           fromY = cur.y;
         }
@@ -49,11 +59,17 @@ export function drawEdges(ctx: CanvasRenderingContext2D, nodes: GNode[], edges: 
       drawUndirectedEdge(ctx, fromX, fromY, toX, toY, edges[i], CIRCLER);
     }
   }
-
 }
 
 //Figure out why these are negative
-function drawSelfEdge(ctx: CanvasRenderingContext2D, rad: number, x: number, y: number, r: number, edge: GEdge) {
+function drawSelfEdge(
+  ctx: CanvasRenderingContext2D,
+  rad: number,
+  x: number,
+  y: number,
+  r: number,
+  edge: GEdge
+) {
   rad = -rad;
   let startX = (r - 10) * Math.cos(rad) + x;
   let startY = (r - 10) * Math.sin(rad) + y;
@@ -73,7 +89,10 @@ function drawSelfEdge(ctx: CanvasRenderingContext2D, rad: number, x: number, y: 
   ctx.stroke();
 
   ctx.lineWidth = 1;
-  let midPoint = [(cx1 + cx2) / 2 - Math.cos(rad) * 20, (cy1 + cy2) / 2 - Math.sin(rad) * 20];
+  let midPoint = [
+    (cx1 + cx2) / 2 - Math.cos(rad) * 20,
+    (cy1 + cy2) / 2 - Math.sin(rad) * 20,
+  ];
 
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -89,10 +108,18 @@ function drawSelfEdge(ctx: CanvasRenderingContext2D, rad: number, x: number, y: 
   ctx.fillText(edge.weight.toString(), midPoint[0], midPoint[1]);
 }
 
-function drawDirectedEdge(ctx: CanvasRenderingContext2D, fromX: number, fromY: number, toX: number, toY: number, edge: GEdge, circleR: number) {
-  let rad = Math.atan2((fromY - toY), (fromX - toX));
-  let startX = (circleR) * Math.cos(rad) + fromX;
-  let startY = (circleR) * Math.sin(rad) + fromY;
+function drawDirectedEdge(
+  ctx: CanvasRenderingContext2D,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  edge: GEdge,
+  circleR: number
+) {
+  let rad = Math.atan2(fromY - toY, fromX - toX);
+  let startX = circleR * Math.cos(rad) + fromX;
+  let startY = circleR * Math.sin(rad) + fromY;
   let endX = (circleR + 15) * Math.cos(rad) + toX;
   let endY = (circleR + 15) * Math.sin(rad) + toY;
   ctx.beginPath();
@@ -102,7 +129,15 @@ function drawDirectedEdge(ctx: CanvasRenderingContext2D, fromX: number, fromY: n
   ctx.stroke();
 }
 
-function drawUndirectedEdge(ctx: CanvasRenderingContext2D, fromX: number, fromY: number, toX: number, toY: number, edge: GEdge, circleR: number) {
+function drawUndirectedEdge(
+  ctx: CanvasRenderingContext2D,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  edge: GEdge,
+  circleR: number
+) {
   let midX = (fromX + toX) / 2;
   let midY = (fromY + toY) / 2;
   ctx.beginPath();
@@ -123,5 +158,4 @@ function drawUndirectedEdge(ctx: CanvasRenderingContext2D, fromX: number, fromY:
   ctx.textBaseline = "middle";
   ctx.textAlign = "center";
   ctx.fillText(edge.weight.toString(), midX, midY);
-
 }
