@@ -8,7 +8,7 @@ export const animateGraph = async (
   edges: GEdge[],
   trace: (number | null)[][],
   ctx: CanvasRenderingContext2D,
-  r: number
+  nodeRadius: number
 ) => {
   let firstNode;
   for (let i = 0; i < trace.length; ++i) {
@@ -30,7 +30,11 @@ export const animateGraph = async (
     currNode!.status = "exploring";
     // Color destination and draw graph
     drawEdges(ctx, nodes, edges);
-    drawNodes(ctx, nodes, r);
+    drawNodes(nodes, {
+      nodeRadius,
+      ctx,
+    });
+
     await delay(1000);
 
     const edge = edges.find(
@@ -44,7 +48,11 @@ export const animateGraph = async (
       nextNode!.status = "exploring";
       // Update edge and next node. Draw graph
       drawEdges(ctx, nodes, edges);
-      drawNodes(ctx, nodes, r);
+      drawNodes(nodes, {
+        nodeRadius,
+        ctx,
+      });
+
       await delay(1000);
       currNode!.status = "explored";
       nextNode!.status = "explored";
@@ -56,13 +64,15 @@ export const animateGraph = async (
     }
   }
 
-  edges.forEach((edge) => {
-    edge.status = "default";
-  });
-  nodes.forEach((node) => {
-    node.status = "default";
-  });
-  firstNode!.status = "selected";
+  edges.forEach((edge) => edge.status = "default");
+  nodes.forEach((node) => node.status = "default");
+
+  if (!firstNode) throw 'first node must be defined in animateGraph';
+  firstNode.status = "selected";
+
   drawEdges(ctx, nodes, edges);
-  drawNodes(ctx, nodes, r);
+  drawNodes(nodes, {
+    nodeRadius,
+    ctx,
+  });
 };

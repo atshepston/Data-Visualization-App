@@ -18,13 +18,6 @@ export type GEdge = {
   status: Status;
 };
 
-// export enum Status {
-//   default = "green",
-//   selected = "red",
-//   explored = "gray",
-//   exploring = "yellow",
-// }
-
 export const STATUS_TO_COLOR = {
   default: "green",
   selected: "red",
