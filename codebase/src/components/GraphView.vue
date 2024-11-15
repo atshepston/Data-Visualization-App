@@ -22,18 +22,9 @@
 
   const canvas = ref<HTMLCanvasElement>();
   const draggingNode = ref<GNode>();
-
-  const pseudoCode = ref([
-    "do",
-    " swapped = false",
-    " for index = 1 to index_of_last_unsorted_element - 1",
-    "  if left_element > right_element",
-    "   swap(left_element, right_element)",
-    "   swapped = true;",
-    "while swapped",
-  ]);
-
-  const currentLines = ref<number[]>([]);
+  const executionSpeed = ref();
+  const executionSpeedMessage = ref()
+  const orderOfVisitedNodes = ref('')
 
   onMounted(() => {
     if (!canvas.value) {
@@ -48,14 +39,26 @@
     canvas.value.addEventListener("mousemove", handleDrag);
   });
 
-  function handleTraversal(algorithm: "bfs" | "dfs") {
+  async function handleTraversal(algorithm: "bfs" | "dfs") {
     if (!canvas.value) return;
     const ctx = canvas.value.getContext("2d");
     if (!ctx) return;
+    if (executionSpeed.value < .5 || executionSpeed.value === undefined) executionSpeed.value = 1;
     const adjacencyList = graphToAdjList(nodes.value, edges.value);
     const algoFn = algorithm === "bfs" ? bfsWithTrace : dfsWithTrace;
     const trace = algoFn(adjacencyList, selectedNodeIds.value[0]);
-    animateGraph(nodes.value, edges.value, trace, ctx, nodeRadius);
+    animateGraph(nodes.value, edges.value, trace.trace, ctx, nodeRadius, executionSpeed.value);
+    orderOfVisitedNodes.value = trace.visited.toString();
+  }
+
+  function speedIsValid() {
+    if (executionSpeed.value < .5 && executionSpeed.value != undefined){
+      executionSpeedMessage.value = "(Delay must be >= .5)"
+      return false;
+    }
+    executionSpeedMessage.value = "(Enter time in seconds)"
+    return true;
+      
   }
 
   function handleMouseDown(event: MouseEvent) {
@@ -152,8 +155,9 @@
 
   function createNewEdge() {
     const [node1Id, node2Id] = [Number(connectionNodeId1.value), Number(connectionNodeId2.value)];
-    // TODO - add some validation logic to make sure that node1Id and node2Id are in the nodes array
-    // and that they dont have an edge between them already
+    if (!nodes.value.some((obj)=>obj.id === node1Id) || !nodes.value.some((obj)=>obj.id === node2Id)) return;
+    if (edges.value.some((obj)=>(obj.from === node1Id && obj.to === node2Id) || (obj.from === node2Id && obj.to === node1Id))) return;
+    if ((!Number.isInteger(node1Id) || !Number.isInteger(node2Id)) || node1Id < 0 || node2Id < 0) return;
     addEdge(node1Id, node2Id);
     connectionNodeId1.value = '';
     connectionNodeId2.value = '';
@@ -183,17 +187,22 @@
     </div>
     <div style="display: flex; gap: 10px; margin: 15px 0px">
       <input
+        style="width: 70px;"
+        min="0"
         v-model="connectionNodeId1"
         type="number"
         placeholder="Node 1"
       />
       <input
+        style="width: 70px;"
+        min="0"
         v-model="connectionNodeId2"
         type="number"
         placeholder="Node 2"
       />
       <button @click="createNewEdge">Create Edge</button>
     </div>
+    <div style="display: flex; gap: 10px; margin: 15px 0px">
     <div class="dropdown">
       <button class="dropbtn">Algorithms</button>
       <div class="dropdown-content">
@@ -211,6 +220,20 @@
         </a>
       </div>
     </div>
+    <div style="display: flex; flex-direction: column; margin: auto auto auto 0;">
+      <input
+          style="width: 70px; margin: auto;"
+          type="number"
+          min=".5"
+          placeholder="Delay (s)"
+          v-model="executionSpeed"
+        />
+        <label v-if="speedIsValid()" style="font-size: 13px;">{{ executionSpeedMessage }}</label>
+        <label v-else style="font-size: 13px;">{{ executionSpeedMessage }}</label>
+    </div>
+    <p style=" margin: auto auto auto 0; background-color: #04aa6d; 
+    width: auto; height: auto; padding: 5px; font-size: 20px; color: white;">Order Visited: {{ orderOfVisitedNodes }}</p>
+  </div>
   </main>
 </template>
 
@@ -227,6 +250,7 @@
     padding: 16px;
     font-size: 16px;
     border: none;
+    border-radius: 5px;
   }
 
   /* The container <div> - needed to position the dropdown content */
@@ -268,20 +292,4 @@
   .dropdown:hover .dropbtn {
     background-color: #3e8e41;
   }
-
-  /* .pseudo-code-container {
-    background-color: #f7f9fc;
-    overflow: auto;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 100%;
-    position: absolute;
-    bottom: 50px;
-    font-size: 14px;
-    font-family: monospace;
-  } */
-
-  /* .highlighted {
-    background-color: yellow;
-  } */
 </style>

@@ -4,7 +4,7 @@ import { STATUS_TO_COLOR } from "../graph/types";
 export type DrawNodeOptions = {
   nodeRadius: number;
   ctx: CanvasRenderingContext2D;
-}
+};
 
 /**
  * draws the nodes of a graph to the canvas

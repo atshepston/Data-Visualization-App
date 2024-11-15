@@ -23,12 +23,12 @@ export function bfsWithTrace(graph: AdjacencyList, source: number) {
     visited.push(curr); // Mark the node as visited
 
     // Traverse the edges of the current node to it's adjacent nodes
-    const adjNodes = graph[curr];
+    const adjNodes = graph[curr].sort((a, b) => a - b);
     if (adjNodes) {
       adjNodes.forEach((adjNode) => queue.push([curr, adjNode]));
     }
   }
-  return trace;
+  return { trace, visited };
 }
 
 /**
@@ -55,10 +55,10 @@ export function dfsWithTrace(graph: AdjacencyList, source: number) {
     visited.push(curr); // Mark as visited
 
     // Traverse to each node and run function recursively
-    const adjNodes = graph[curr];
+    const adjNodes = graph[curr].sort((a, b) => a - b);
     if (adjNodes) adjNodes.forEach((adjNode) => dfs([curr, adjNode]));
   }
 
   dfs(startNode); // Start DFS from the source node
-  return trace;
+  return { trace, visited };
 }

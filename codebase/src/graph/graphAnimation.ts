@@ -8,7 +8,8 @@ export const animateGraph = async (
   edges: GEdge[],
   trace: (number | null)[][],
   ctx: CanvasRenderingContext2D,
-  nodeRadius: number
+  nodeRadius: number,
+  speed: number
 ) => {
   let firstNode;
   for (let i = 0; i < trace.length; ++i) {
@@ -35,7 +36,7 @@ export const animateGraph = async (
       ctx,
     });
 
-    await delay(1000);
+    await delay(speed * 1000);
 
     const edge = edges.find(
       (e) =>
@@ -53,21 +54,21 @@ export const animateGraph = async (
         ctx,
       });
 
-      await delay(1000);
+      await delay(speed * 1000);
       currNode!.status = "explored";
       nextNode!.status = "explored";
       edge.status = "explored";
       // Mark edge and nodes as explored after visual update
       //   drawEdges(ctx, nodes, edges);
       //   drawNodes(ctx, nodes, r);
-      //   await delay(1000);
+      //   await delay(speed);
     }
   }
 
-  edges.forEach((edge) => edge.status = "default");
-  nodes.forEach((node) => node.status = "default");
+  edges.forEach((edge) => (edge.status = "default"));
+  nodes.forEach((node) => (node.status = "default"));
 
-  if (!firstNode) throw 'first node must be defined in animateGraph';
+  if (!firstNode) throw "first node must be defined in animateGraph";
   firstNode.status = "selected";
 
   drawEdges(ctx, nodes, edges);
