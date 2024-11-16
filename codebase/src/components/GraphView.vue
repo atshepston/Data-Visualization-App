@@ -173,8 +173,9 @@
         height: '500px',
         border: '1px solid black',
         position: 'relative',
+        margin: 'auto'
       }"
-    >
+      >
       <canvas
         :style="{
           width: '100%',
@@ -185,7 +186,7 @@
         height="500"
       ></canvas>
     </div>
-    <div style="display: flex; gap: 10px; margin: 15px 0px">
+    <div style="display: flex; gap: 10px; margin: 15px 0; justify-content: center;">
       <input
         style="width: 70px;"
         min="0"
@@ -202,25 +203,25 @@
       />
       <button @click="createNewEdge">Create Edge</button>
     </div>
-    <div style="display: flex; gap: 10px; margin: 15px 0px">
-    <div class="dropdown">
-      <button class="dropbtn">Algorithms</button>
-      <div class="dropdown-content">
-        <a
-          href="#"
-          @click="handleTraversal('bfs')"
-        >
-          BFS
-        </a>
-        <a
-          href="#"
-          @click="handleTraversal('dfs')"
-        >
-          DFS
-        </a>
+    <div style="display: flex; gap: 20px; margin: auto 0 auto auto; justify-content: center;">
+      <div class="dropdown">
+        <button class="dropbtn">Algorithms</button>
+        <div class="dropdown-content">
+          <a
+            href="#"
+            @click="handleTraversal('bfs')"
+          >
+            BFS
+          </a>
+          <a
+            href="#"
+            @click="handleTraversal('dfs')"
+          >
+            DFS
+          </a>
+        </div>
       </div>
-    </div>
-    <div style="display: flex; flex-direction: column; margin: auto auto auto 0;">
+      <div style="display: flex; height: 50px; flex-direction: column; margin: auto 0;">
       <input
           style="width: 70px; margin: auto;"
           type="number"
@@ -231,12 +232,11 @@
         <label v-if="speedIsValid()" style="font-size: 13px;">{{ executionSpeedMessage }}</label>
         <label v-else style="font-size: 13px;">{{ executionSpeedMessage }}</label>
     </div>
-    <p style=" margin: auto auto auto 0; background-color: #04aa6d; 
-    width: auto; height: auto; padding: 5px; font-size: 20px; color: white;">Order Visited: {{ orderOfVisitedNodes }}</p>
+    <p style="background-color: #04aa6d; width: auto; height: auto; padding: 5px; font-size: 20px; color: white;
+    border-radius: 5px; margin: auto 0">Order Visited: [{{ orderOfVisitedNodes }}]</p>
   </div>
   </main>
 </template>
-
 <style scoped>
   .center {
     margin: auto;
