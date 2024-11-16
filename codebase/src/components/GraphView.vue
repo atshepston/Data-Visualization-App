@@ -154,14 +154,43 @@
   const connectionNodeId2 = ref('');
 
   function createNewEdge() {
+    if (connectionNodeId1.value === '' || connectionNodeId2.value === '') return;
     const [node1Id, node2Id] = [Number(connectionNodeId1.value), Number(connectionNodeId2.value)];
-    if (!nodes.value.some((obj)=>obj.id === node1Id) || !nodes.value.some((obj)=>obj.id === node2Id)) return;
-    if (edges.value.some((obj)=>(obj.from === node1Id && obj.to === node2Id) || (obj.from === node2Id && obj.to === node1Id))) return;
-    if ((!Number.isInteger(node1Id) || !Number.isInteger(node2Id)) || node1Id < 0 || node2Id < 0) return;
+
+    const node1InGraph = nodes.value.some((n) => n.id === node1Id)
+    const node2InGraph = nodes.value.some((n) => n.id === node2Id)
+    if (!node1InGraph || !node2InGraph) return;
+
+    const edgeExistsOnPath = edges.value.some((e) => (e.from === node1Id && e.to === node2Id) || (e.from === node2Id && e.to === node1Id))
+    if (edgeExistsOnPath) return;
+
     addEdge(node1Id, node2Id);
+
     connectionNodeId1.value = '';
     connectionNodeId2.value = '';
   }
+
+  function removeEdge() {
+    const [node1Id, node2Id] = [Number(connectionNodeId1.value), Number(connectionNodeId2.value)];
+    const edgeExistsOnPath = edges.value.some((e) => (e.from === node1Id && e.to === node2Id) || (e.from === node2Id && e.to === node1Id))
+    if (!edgeExistsOnPath) return;
+
+    edges.value = edges.value.filter((e)=>!(e.from === node1Id && e.to === node2Id) && !(e.from === node2Id && e.to === node1Id));
+
+    connectionNodeId1.value = '';
+    connectionNodeId2.value = '';
+  }
+
+  function clearAll() {
+  if (canvas.value) {
+    newNodeId = 0;
+    newEdgeId = 0;
+    nodes.value = [];
+    selectedNodeIds.value = [];
+    edges.value = [];
+    redraw();
+  }
+}
 </script>
 
 <template>
@@ -188,20 +217,22 @@
     </div>
     <div style="display: flex; gap: 10px; margin: 15px 0; justify-content: center;">
       <input
-        style="width: 70px;"
+        style="width: 70px; border: solid 1px black; border-radius: 5px;"
         min="0"
         v-model="connectionNodeId1"
         type="number"
         placeholder="Node 1"
       />
       <input
-        style="width: 70px;"
+        style="width: 70px; border: solid 1px black; border-radius: 5px;"
         min="0"
         v-model="connectionNodeId2"
         type="number"
         placeholder="Node 2"
       />
-      <button @click="createNewEdge">Create Edge</button>
+      <button id='createEdge' @click="createNewEdge">Create Edge</button>
+      <button id='removeEdge' @click="removeEdge">Remove Edge</button>
+      <button id='clearAll' @click="clearAll">Clear All</button>
     </div>
     <div style="display: flex; gap: 20px; margin: auto 0 auto auto; justify-content: center;">
       <div class="dropdown">
@@ -223,7 +254,7 @@
       </div>
       <div style="display: flex; height: 50px; flex-direction: column; margin: auto 0;">
       <input
-          style="width: 70px; margin: auto;"
+          style="width: 70px; margin: auto; border: solid 1px black; border-radius: 5px;"
           type="number"
           min=".5"
           placeholder="Delay (s)"
@@ -238,6 +269,49 @@
   </main>
 </template>
 <style scoped>
+  #removeEdge {
+    background-color: rgba(255, 0, 0, 0.6); 
+    border: none; 
+    border-radius: 5px;
+    color: white;
+  }
+
+  #createEdge {
+    background-color: #04aa6d;
+    border: none; 
+    border-radius: 5px;
+    color: white;
+  }
+
+  #clearAll {
+    background-color: #3c53a4;
+    border: none; 
+    border-radius: 5px;
+    color: white;
+  }
+
+  #clearAll:hover {
+    background-color: rgb(30, 30, 193);
+    border: none; 
+    border-radius: 5px;
+    color: white;
+    transform: scale(105%);
+  }
+
+  #removeEdge:hover {
+    background-color: rgb(193, 30, 30); 
+    border: none; 
+    border-radius: 5px;
+    transform: scale(105%);
+  }
+
+  #createEdge:hover {
+    background-color: #3e8e41; 
+    border: none; 
+    border-radius: 5px;
+    transform: scale(105%);
+  }
+
   .center {
     margin: auto;
     padding: 10px;
