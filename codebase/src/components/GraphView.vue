@@ -26,8 +26,9 @@ const executionSpeed = ref();
 const executionSpeedMessage = ref();
 const orderOfVisitedNodes = ref("");
 
+//Edge weight for the edge currently selected
 const selectedEdgeWeight = ref("");
-let edgeType: "directed" | "undirected" = "undirected";
+const edgeType = ref<"directed"|"undirected">("undirected");
 
 
 onMounted(() => {
@@ -125,7 +126,7 @@ function addEdge(fromNodeId: GNode["id"], toNodeId: GNode["id"]) {
     id: newEdgeId,
     from: fromNodeId,
     to: toNodeId,
-    type: edgeType,
+    type: edgeType.value,
     weight: 1,
     status: "selected",
   });
@@ -156,10 +157,10 @@ function redraw() {
   });
 }
 function toggleEdgeType() {
-  if (edgeType == "directed") {
-    edgeType = "undirected";
+  if (edgeType.value == "directed") {
+    edgeType.value = "undirected";
   } else {
-    edgeType = "directed";
+    edgeType.value = "directed";
   }
   clearAll();
 }
@@ -296,7 +297,7 @@ function clearAll() {
       <input style="width: 80px; border: solid 1px black; border-radius: 5px"
 id="edgeWeight" type = "number" v-model="selectedEdgeWeight" @change="editEdgeWeight" placeholder="Edge Weight"></input>
       <button @click="toggleEdgeType">
-        Click to Toggle between directed and undirected
+       Toggle directed/undirected 
 	  </button> 
     </div>
     <div
