@@ -6,10 +6,10 @@ import { drawNodes } from "@/components/node";
 export const animateGraph = async (
   nodes: GNode[],
   edges: GEdge[],
-  trace: (number | null)[][],
+  trace: (GNode["id"] | null)[][],
   ctx: CanvasRenderingContext2D,
   nodeRadius: number,
-  speed: number
+  delayDuration: number
 ) => {
   let firstNode;
   for (let i = 0; i < trace.length; ++i) {
@@ -36,7 +36,7 @@ export const animateGraph = async (
       ctx,
     });
 
-    await delay(speed * 1000);
+    await delay(delayDuration * 1000);
 
     const edge = edges.find(
       (e) =>
@@ -46,7 +46,7 @@ export const animateGraph = async (
 
     if (edge) {
       edge.status = "exploring";
-      nextNode!.status = "exploring";
+      if (nextNode) nextNode.status = "exploring";
       // Update edge and next node. Draw graph
       drawEdges(ctx, nodes, edges);
       drawNodes(nodes, {
@@ -54,9 +54,9 @@ export const animateGraph = async (
         ctx,
       });
 
-      await delay(speed * 1000);
-      currNode!.status = "explored";
-      nextNode!.status = "explored";
+      await delay(delayDuration * 1000);
+      if (currNode) currNode.status = "explored";
+      if (nextNode) nextNode.status = "explored";
       edge.status = "explored";
       // Mark edge and nodes as explored after visual update
       //   drawEdges(ctx, nodes, edges);

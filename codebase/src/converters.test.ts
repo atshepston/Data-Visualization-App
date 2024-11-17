@@ -2,11 +2,11 @@ import { test, expect } from "vitest";
 import type { GNode, GEdge } from "./graph/types";
 import { graphToAdjList } from "./converters";
 
-const node1 = { id: 1, x: 10, y: 10, status: 'default' };
-const node2 = { id: 2, x: 20, y: 20, status: 'default' };
-const node3 = { id: 3, x: 30, y: 30, status: 'default' };
-const node4 = { id: 4, x: 40, y: 40, status: 'default' };
-const node5 = { id: 5, x: 50, y: 50, status: 'default' };
+const node1: GNode = { id: 1, x: 10, y: 10, status: "default" };
+const node2: GNode = { id: 2, x: 20, y: 20, status: "default" };
+const node3: GNode = { id: 3, x: 30, y: 30, status: "default" };
+const node4: GNode = { id: 4, x: 40, y: 40, status: "default" };
+const node5: GNode = { id: 5, x: 50, y: 50, status: "default" };
 
 const edge1 = { id: 1, to: 2, from: 1, weight: 1, type: "undirected" };
 const edge2 = { id: 2, to: 3, from: 2, weight: 1, type: "undirected" };

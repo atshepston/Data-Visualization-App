@@ -1,15 +1,16 @@
 import { test, expect } from "vitest";
 import { bfsWithTrace, dfsWithTrace } from "./algorithms";
 import { graphToAdjList } from "./converters";
-import type { GEdge } from "./graph/types";
+import { STATUS_TO_COLOR, type GEdge } from "./graph/types";
+import type { GNode, Status } from "./graph/types";
 
 test("Basic bfs execution", () => {
   const adjList = { 1: [2, 3], 2: [1, 3, 4], 3: [1, 2], 4: [2] };
 
-  const node1 = { id: 1, x: 10, y: 10, status: 'default' };
-  const node2 = { id: 2, x: 20, y: 20, status: 'default' };
-  const node3 = { id: 3, x: 30, y: 30, status: 'default' };
-  const node4 = { id: 4, x: 40, y: 40, status: 'default' };
+  const node1: GNode = { id: 1, x: 10, y: 10, status: "default" };
+  const node2: GNode = { id: 2, x: 20, y: 20, status: "default" };
+  const node3: GNode = { id: 3, x: 30, y: 30, status: "default" };
+  const node4: GNode = { id: 4, x: 40, y: 40, status: "default" };
 
   const edge1 = { id: 1, to: 2, from: 1, weight: 1, type: "undirected" };
   const edge2 = { id: 2, to: 3, from: 2, weight: 1, type: "undirected" };
@@ -35,50 +36,3 @@ test("Basic bfs execution", () => {
   ];
   expect(result).toStrictEqual(expected);
 });
-
-// test("Test bfs on a single node with no neighbors", () => {
-//   const adjList = { 1: [], 2: [1, 3], 3: [2], 4: [1, 5], 5: [4] };
-//   const result = bfsWithTrace(adjList, 1);
-//   const expected = [1];
-//   expect(result).toStrictEqual(expected);
-// });
-
-// test("Test bfs on a loop", () => {
-//   const adjList = {
-//     1: [2, 4, 5],
-//     2: [1, 3],
-//     3: [2],
-//     4: [1, 5],
-//     5: [1, 4],
-//   };
-//   const result = bfsWithTrace(adjList, 1);
-//   const expected = [1, 2, 4, 5, 3];
-//   expect(result).toStrictEqual(expected);
-// });
-
-// test("Basic dfs execution", () => {
-//   const adjList = { 1: [2, 4], 2: [1, 3], 3: [2], 4: [1, 5], 5: [4] };
-//   const result = dfsWithTrace(adjList, 1);
-//   const expected = [1, 2, 3, 4, 5];
-//   expect(result).toStrictEqual(expected);
-// });
-
-// test("Test dfs on a single node with no neighbors", () => {
-//   const adjList = { 1: [], 2: [1, 3], 3: [2], 4: [1, 5], 5: [4] };
-//   const result = dfsWithTrace(adjList, 1);
-//   const expected = [1];
-//   expect(result).toStrictEqual(expected);
-// });
-
-// test("Test dfs on a loop", () => {
-//   const adjList = {
-//     1: [2, 4, 5],
-//     2: [1, 3],
-//     3: [2],
-//     4: [1, 5],
-//     5: [1, 4],
-//   };
-//   const result = dfsWithTrace(adjList, 1);
-//   const expected = [1, 2, 3, 4, 5];
-//   expect(result).toStrictEqual(expected);
-// });
