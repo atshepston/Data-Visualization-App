@@ -49,6 +49,7 @@
             'right-index': index === currentRightIndex,
             'sorted-index':
               currentSortedIndex !== null && index >= currentSortedIndex,
+            //currentSortedIndex !== null && index <= currentSortedIndex, //need this line for selection sort
           }"
           :style="{
             height: `${number * (number / Math.max(...array)) * 7}px`,
@@ -77,6 +78,8 @@
 <script setup lang="ts">
   import { ref, defineEmits } from "vue";
   import { bubbleSort } from "../algorithms/bubble";
+  import { selectionSort } from "../algorithms/selection";
+  import { insertionSort } from "../algorithms/insertion";
 
   const emit = defineEmits<{
     (event: "sortedArray", value: number[]): void;
@@ -118,6 +121,11 @@ while swapped`.split("\n");
               swapped = true;
 while swapped`.split("\n");
 
+  const selectionSortPseudoCode =
+    `for index = 0 to index_of_last_unsorted_element - 1
+      find smallest unsorted element
+      swap(left_element, right_element)`.split("\n");
+
   const updateLeftIndex = (index: number | null) => {
     currentLeftIndex.value = index;
   };
@@ -126,7 +134,7 @@ while swapped`.split("\n");
     currentRightIndex.value = index;
   };
 
-  const updateCurrentLines = (lines: number[]) => {
+  const setHighlightedLines = (lines: number[]) => {
     currentLines.value = lines;
   };
 
@@ -175,19 +183,34 @@ while swapped`.split("\n");
     await bubbleSort({
       array: array.value,
       ms: 500,
-      updateSwap: updateSwap,
-      updateLeftIndex: updateLeftIndex,
-      updateRightIndex: updateRightIndex,
-      updateCurrentLines: updateCurrentLines,
-      updateSortedIndex: updateSortedIndex,
+      ui: {
+        updateSwap: updateSwap,
+        updateLeftIndex: updateLeftIndex,
+        updateRightIndex: updateRightIndex,
+        setHighlightedLines: setHighlightedLines,
+        updateSortedIndex: updateSortedIndex,
+      },
     });
     // await insertionSort({
-    //     array: array.value,
-    //     ms: 500,
+    //   array: array.value,
+    //   ms: 500,
+    //   ui: {
     //     updateSwap: updateSwap,
     //     updateLeftIndex: updateLeftIndex,
     //     updateRightIndex: updateRightIndex,
-    //     updateCurrentLines: updateCurrentLines,
+    //     setHighlightedLines: setHighlightedLines,
+    //   },
+    // });
+    // await selectionSort({
+    //   array: array.value,
+    //   ms: 500,
+    //   ui: {
+    //     updateSwap: updateSwap,
+    //     updateLeftIndex: updateLeftIndex,
+    //     updateRightIndex: updateRightIndex,
+    //     setHighlightedLines: setHighlightedLines,
+    //     updateSortedIndex: updateSortedIndex,
+    //   },
     // });
     emit("sortedArray", array.value);
     resetValue();

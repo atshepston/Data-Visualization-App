@@ -1,75 +1,71 @@
-import { swap, delay } from "./bubble";
+import { swap, visualizationDelay } from "./bubble";
 
 // Function to sort array using insertion sort
 export const selectionSort = async ({
   array,
   ms,
-  updateSwap,
-  updateLeftIndex,
-  updateRightIndex,
-  updateCurrentLines,
-  updateSortedIndex,
+  ui,
 }: {
   array: number[];
   ms: number;
-  updateSwap: (newArray: number[]) => void;
-  updateLeftIndex: (index: number | null) => void;
-  updateRightIndex: (index: number | null) => void;
-  updateCurrentLines: (lines: number[]) => void;
-  updateSortedIndex: (index: number | null) => void;
+  ui: {
+    updateSwap: (newArray: number[]) => void;
+    updateLeftIndex: (index: number | null) => void;
+    updateRightIndex: (index: number | null) => void;
+    setHighlightedLines: (lines: number[]) => void;
+    updateSortedIndex: (index: number | null) => void;
+  };
 }): Promise<number[]> => {
-  let swapped;
-  let sortedIndex = array.length;
-  do {
-    let curElem;
-    let minElem;
+  let sortedIndex = -1;
+  let minIndex;
 
-    // Highlight "do"
-    updateCurrentLines([0]);
-    swapped = false;
-    // Highlight "swapped = false" and "for loop"
-    updateCurrentLines([1, 2]);
-    for (let i = 0; i < sortedIndex; i++) {
-      // Visualization delay
-      await delay(ms);
-      updateLeftIndex(i);
-      //updateRightIndex(i + 1);
+  // Highlight "for index = 0 to index_of_last_unsorted_element - 1"
+  ui.setHighlightedLines([0]);
 
-      let j = i;
-      // Highlight "while left_element >=  0"
-      updateCurrentLines([3]);
-      while (j <= sortedIndex && swapped === false) {
-        //find smallest element in unsorted section
-        updateCurrentLines([4]);
-        if (array[j] < array[i]) {
-          // Highlight "if condition"
-          updateCurrentLines([5, 6]);
-          await swap(array, i, j, ms, updateSwap, updateCurrentLines);
-          swapped = true;
-          await delay(ms);
-          updateLeftIndex(i + 1);
-          //updateLeftIndex(j); // j might be -1
-          //updateRightIndex(i);
-        } else {
-          j = j + 1;
-          updateRightIndex(j);
-        }
+  for (let i = 0; i < array.length; i++) {
+    //i represents the index of the current elements
+    await visualizationDelay(ms);
+    ui.updateLeftIndex(i);
+
+    minIndex = i;
+    // Find index of smallest element
+    // Highlight "find smallest unsorted element"
+    ui.setHighlightedLines([1]);
+    for (let j = i; j < array.length; j++) {
+      if (array[j] < array[minIndex]) {
+        minIndex = j;
       }
-      // Visualization delay
-      updateCurrentLines([7]);
-      updateSortedIndex(j);
-      await delay(ms);
     }
-  } while (swapped);
-  // Highlight "while condition"
-  updateCurrentLines([6]);
+
+    await visualizationDelay(ms);
+    ui.updateRightIndex(minIndex);
+
+    // Highlight "find smallest unsorted element"
+    ui.setHighlightedLines([2]);
+    await swap({
+      array: array,
+      a: i,
+      b: minIndex,
+      ms: ms,
+      updateSwap: ui.updateSwap,
+      setHighlightedLines: ui.setHighlightedLines,
+    });
+
+    await visualizationDelay(ms);
+    ui.updateLeftIndex(null);
+    ui.updateRightIndex(null);
+
+    sortedIndex++;
+    ui.updateSortedIndex(sortedIndex);
+    await visualizationDelay(ms);
+  }
   // Reset indices
-  updateLeftIndex(null);
-  updateRightIndex(null);
-  // Visualization delay
-  await delay(ms);
+  ui.updateLeftIndex(null);
+  ui.updateRightIndex(null);
+
+  await visualizationDelay(ms);
   // Reset highlights
-  updateCurrentLines([]);
+  ui.setHighlightedLines([]);
   // Return sorted array
   return array;
 };
