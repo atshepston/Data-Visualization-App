@@ -18,10 +18,13 @@ export type GEdge = {
   status: Status;
 };
 
-export enum Status {
-  default = "green",
-  selected = "red",
-  explored = "gray",
-  exploring = "yellow",
-}
+export const STATUS_TO_COLOR = {
+  default: "green",
+  selected: "red",
+  explored: "gray",
+  exploring: "yellow",
+} as const;
+
+export type Status = keyof typeof STATUS_TO_COLOR;
+
 export type AdjacencyList = Record<number, number[]>; // Adjacency list representation of graph

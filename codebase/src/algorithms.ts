@@ -14,18 +14,21 @@ export function bfsWithTrace(graph: AdjacencyList, source: number) {
 
   while (queue.length > 0) {
     const [source, curr] = queue.shift()!; // Get the first node from the queue
-    trace.push([source, curr]);
     const alreadyVisited = visited.includes(curr); // Check if it's already visited
 
     if (alreadyVisited) continue;
 
+    trace.push([source, curr]);
+
     visited.push(curr); // Mark the node as visited
 
     // Traverse the edges of the current node to it's adjacent nodes
-    const adjNodes = graph[curr];
-    adjNodes.forEach((adjNode) => queue.push([curr, adjNode]));
+    const adjNodes = graph[curr].sort((a, b) => a - b);
+    if (adjNodes) {
+      adjNodes.forEach((adjNode) => queue.push([curr, adjNode]));
+    }
   }
-  return trace;
+  return { trace, visited };
 }
 
 /**
@@ -41,20 +44,21 @@ export function dfsWithTrace(graph: AdjacencyList, source: number) {
   const startNode: [number | null, number] = [null, source];
   function dfs(nodes: [number | null, number]): void {
     let [source, curr] = nodes;
-    trace.push([source, curr]);
     const alreadyVisited = visited.includes(curr);
 
     if (alreadyVisited) {
       return;
     } // Stop recursion if already visited
 
+    trace.push([source, curr]);
+
     visited.push(curr); // Mark as visited
 
     // Traverse to each node and run function recursively
-    const adjNodes = graph[curr];
-    adjNodes.forEach((adjNode) => dfs([curr, adjNode]));
+    const adjNodes = graph[curr].sort((a, b) => a - b);
+    if (adjNodes) adjNodes.forEach((adjNode) => dfs([curr, adjNode]));
   }
 
   dfs(startNode); // Start DFS from the source node
-  return trace;
+  return { trace, visited };
 }

@@ -1,0 +1,9 @@
+{
+"prettier.singleAttributePerLine": true,       // Forces single line per attribute
+"prettier.htmlWhitespaceSensitivity": "ignore", // Ensures whitespace is respected
+"prettier.vueIndentScriptAndStyle": true,      // Indents scripts and styles in .vue files
+
+"[vue]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"  // Ensure Prettier formats .vue files
+},
+}
