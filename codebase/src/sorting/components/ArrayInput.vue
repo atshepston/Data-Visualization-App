@@ -191,16 +191,16 @@ while swapped`.split("\n");
         updateSortedIndex: updateSortedIndex,
       },
     });
-    // await insertionSort({
-    //   array: array.value,
-    //   ms: 500,
-    //   ui: {
-    //     updateSwap: updateSwap,
-    //     updateLeftIndex: updateLeftIndex,
-    //     updateRightIndex: updateRightIndex,
-    //     setHighlightedLines: setHighlightedLines,
-    //   },
-    // });
+    //await insertionSort({
+    //  array: array.value,
+    //  ms: 500,
+    //  ui: {
+    //    updateSwap: updateSwap,
+    //    updateLeftIndex: updateLeftIndex,
+    //    updateRightIndex: updateRightIndex,
+    //    setHighlightedLines: setHighlightedLines,
+    //  },
+    //});
     // await selectionSort({
     //   array: array.value,
     //   ms: 500,

@@ -166,7 +166,7 @@
 
   setInterval(() => {
     redraw();
-  }, 1000 / 24);
+  }, 1000 / 60);
 
   const connectionNodeId1 = ref("");
   const connectionNodeId2 = ref("");
