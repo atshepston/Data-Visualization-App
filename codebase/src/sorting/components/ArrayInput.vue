@@ -240,7 +240,6 @@ while swapped`.split("\n");
         },
       });
     }
-
     emit("sortedArray", array.value);
     resetValue();
   };
