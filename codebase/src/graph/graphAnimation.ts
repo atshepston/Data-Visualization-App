@@ -1,5 +1,5 @@
 import { type GNode, type GEdge } from "./types";
-import { delay } from "@/sorting/algorithms/bubble";
+import { visualizationDelay } from "@/sorting/algorithms/bubble";
 import { drawEdges } from "@/components/edge";
 import { drawNodes } from "@/components/node";
 
@@ -36,7 +36,7 @@ export const animateGraph = async (
       ctx,
     });
 
-    await delay(delayDuration * 1000);
+    await visualizationDelay(delayDuration * 1000);
 
     const edge = edges.find(
       (e) =>
@@ -54,7 +54,7 @@ export const animateGraph = async (
         ctx,
       });
 
-      await delay(delayDuration * 1000);
+      await visualizationDelay(delayDuration * 1000);
       if (currNode) currNode.status = "explored";
       if (nextNode) nextNode.status = "explored";
       edge.status = "explored";
