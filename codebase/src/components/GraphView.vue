@@ -232,7 +232,10 @@
     );
     if (!edgeExistsOnPath) return;
     edges.value.forEach((e) => {
-      if (e.from == node1Id && e.to == node2Id) {
+      if (
+        (e.from == node1Id && e.to == node2Id) ||
+        (e.from === node2Id && e.to === node1Id)
+      ) {
         e.weight = Number(selectedEdgeWeight.value);
       }
     });
