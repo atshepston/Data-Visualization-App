@@ -48,8 +48,9 @@
             'left-index': index === currentLeftIndex,
             'right-index': index === currentRightIndex,
             'sorted-index':
-              currentSortedIndex !== null && index >= currentSortedIndex,
-            //currentSortedIndex !== null && index <= currentSortedIndex, //need this line for selection sort
+              selectedAlgorithm === 'selectionSort'
+                ? currentSortedIndex !== null && index <= currentSortedIndex
+                : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
           :style="{
             height: `${number * (number / Math.max(...array)) * 7}px`,
@@ -72,11 +73,28 @@
         {{ line.trim() }}
       </div>
     </div>
+
+    <div class="algorithm-dropdown-container">
+      <label for="algorithm-dropdown">Select Algorithm:</label>
+      <select
+        id="algorithm-dropdown"
+        v-model="selectedAlgorithm"
+      >
+        <option
+          v-for="algorithm in algorithms"
+          :key="algorithm.value"
+          :value="algorithm.value"
+        >
+          {{ algorithm.label }}
+        </option>
+      </select>
+      <p>You selected: {{ selectedAlgorithm }}</p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, defineEmits } from "vue";
+  import { ref, defineEmits, watch } from "vue";
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
@@ -89,42 +107,48 @@
   const array = ref<number[]>([]);
   const error = ref("");
 
+  const selectedAlgorithm = ref("");
+
+  const algorithms = ref([
+    { value: "bubbleSort", label: "Bubble Sort" },
+    { value: "insertionSort", label: "Insertion Sort" },
+    { value: "selectionSort", label: "Selection Sort" },
+  ]);
+
   let currentLeftIndex = ref<number | null>(null);
   let currentRightIndex = ref<number | null>(null);
   const currentLines = ref<number[]>([]);
   const currentSortedIndex = ref<number | null>(null);
 
-  const pseudoCode = ref([
-    "do",
-    " swapped = false",
-    " for index = 1 to index_of_last_unsorted_element - 1",
-    "  if left_element > right_element",
-    "   swap(left_element, right_element)",
-    "   swapped = true;",
-    "while swapped",
-  ]);
+  const pseudoCode = ref([""]);
 
-  const bubbleSortPseudoCode = `do
-   swapped = false
-   for index = 1 to index_of_last_unsorted_element - 1
-       if left_element > right_element
-           swap(left_element, right_element)
-           swapped = true;
+  // Watch for changes to selectedAlgorithm dropdown
+  watch(selectedAlgorithm, (newVal) => {
+    if (newVal === "bubbleSort") {
+      pseudoCode.value = `do
+  swapped = false
+  for index = 1 to index_of_last_unsorted_element - 1
+    if left_element > right_element
+      swap(left_element, right_element)
+      swapped = true;
 while swapped`.split("\n");
-
-  const insertionSortPseudoCode = `do
-   swapped = false
-   for index = 1 to index_of_last_unsorted_element - 1
-      while left_element >=  0
-          if left_element > right_element
-              swap(left_element, right_element)
-              swapped = true;
+    } else if (newVal === "insertionSort") {
+      pseudoCode.value = `do
+  swapped = false
+  for index = 1 to index_of_last_unsorted_element - 1
+    while left_element >= 0
+      if left_element > right_element
+        swap(left_element, right_element)
+        swapped = true;
 while swapped`.split("\n");
-
-  const selectionSortPseudoCode =
-    `for index = 0 to index_of_last_unsorted_element - 1
-      find smallest unsorted element
-      swap(left_element, right_element)`.split("\n");
+    } else if (newVal === "selectionSort") {
+      pseudoCode.value = `for index = 0 to index_of_last_unsorted_element - 1
+    find smallest unsorted element
+    swap(left_element, right_element)`.split("\n");
+    } else {
+      pseudoCode.value = [""]; // Reset if no algorithm is selected
+    }
+  });
 
   const updateLeftIndex = (index: number | null) => {
     currentLeftIndex.value = index;
@@ -180,38 +204,42 @@ while swapped`.split("\n");
   };
 
   const sortArray = async () => {
-    await bubbleSort({
-      array: array.value,
-      ms: 500,
-      ui: {
-        updateSwap: updateSwap,
-        updateLeftIndex: updateLeftIndex,
-        updateRightIndex: updateRightIndex,
-        setHighlightedLines: setHighlightedLines,
-        updateSortedIndex: updateSortedIndex,
-      },
-    });
-    //await insertionSort({
-    //  array: array.value,
-    //  ms: 500,
-    //  ui: {
-    //    updateSwap: updateSwap,
-    //    updateLeftIndex: updateLeftIndex,
-    //    updateRightIndex: updateRightIndex,
-    //    setHighlightedLines: setHighlightedLines,
-    //  },
-    //});
-    // await selectionSort({
-    //   array: array.value,
-    //   ms: 500,
-    //   ui: {
-    //     updateSwap: updateSwap,
-    //     updateLeftIndex: updateLeftIndex,
-    //     updateRightIndex: updateRightIndex,
-    //     setHighlightedLines: setHighlightedLines,
-    //     updateSortedIndex: updateSortedIndex,
-    //   },
-    // });
+    if (selectedAlgorithm.value === "bubbleSort") {
+      await bubbleSort({
+        array: array.value,
+        ms: 500,
+        ui: {
+          updateSwap: updateSwap,
+          updateLeftIndex: updateLeftIndex,
+          updateRightIndex: updateRightIndex,
+          setHighlightedLines: setHighlightedLines,
+          updateSortedIndex: updateSortedIndex,
+        },
+      });
+    } else if (selectedAlgorithm.value === "insertionSort") {
+      await insertionSort({
+        array: array.value,
+        ms: 500,
+        ui: {
+          updateSwap: updateSwap,
+          updateLeftIndex: updateLeftIndex,
+          updateRightIndex: updateRightIndex,
+          setHighlightedLines: setHighlightedLines,
+        },
+      });
+    } else if (selectedAlgorithm.value === "selectionSort") {
+      await selectionSort({
+        array: array.value,
+        ms: 500,
+        ui: {
+          updateSwap: updateSwap,
+          updateLeftIndex: updateLeftIndex,
+          updateRightIndex: updateRightIndex,
+          setHighlightedLines: setHighlightedLines,
+          updateSortedIndex: updateSortedIndex,
+        },
+      });
+    }
     emit("sortedArray", array.value);
     resetValue();
   };
