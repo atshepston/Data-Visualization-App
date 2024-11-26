@@ -65,7 +65,8 @@
         nodeRadius,
         executionSpeed.value
       );
-      orderOfVisitedNodes.value = trace.visited.toString();
+      orderOfVisitedNodes.value =
+        "Order Visited: [" + trace.visited.toString() + "]";
     } else {
       algoFn = dijkstraWithTrace;
       const trace = algoFn(nodes.value, edges.value, selectedNodeIds.value[0]);
@@ -284,6 +285,8 @@
       nodes.value = [];
       selectedNodeIds.value = [];
       edges.value = [];
+      orderOfVisitedNodes.value = "Create a new graph";
+      dijkstraNodeCosts.value = "Create a new graph";
       redraw();
     }
   }
@@ -433,7 +436,7 @@
         "
         v-if="selectedAlgorithm == 'bfs' || selectedAlgorithm == 'dfs'"
       >
-        Order Visited: [{{ orderOfVisitedNodes }}]
+        {{ orderOfVisitedNodes }}
       </p>
       <p
         style="
@@ -450,6 +453,31 @@
       >
         {{ dijkstraNodeCosts }}
       </p>
+    </div>
+    <div
+      style="
+        margin: 10px auto;
+        display: flex;
+        justify-content: center;
+        border: solid black 2px;
+        max-width: 800px;
+        border-radius: 10px;
+      "
+    >
+      <ul style="font-size: 20px">
+        <li>Click within the borders to create a node</li>
+        <li>Double click on a node to select it</li>
+        <li>Click and hold down on a node to drag it around</li>
+        <li>
+          To add or remove an edge between two nodes, enter the node values and
+          press the corresponding button
+        </li>
+        <li>
+          When toggling between directed and undirected edges, the graph will
+          clear
+        </li>
+        <li>To delete the graph, select "Clear All"</li>
+      </ul>
     </div>
   </main>
 </template>
