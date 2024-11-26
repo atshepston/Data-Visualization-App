@@ -3,9 +3,9 @@
   import { drawNodes } from "./node";
   import { drawEdges } from "./edge";
   import type { GNode, GEdge } from "../graph/types";
-  import { animateGraph } from "@/graph/graphAnimation";
+  import { animateBFSandDFS, animateDijkstras } from "@/graph/graphAnimation";
   import { graphToAdjList } from "@/converters";
-  import { bfsWithTrace, dfsWithTrace } from "@/algorithms";
+  import { bfsWithTrace, dfsWithTrace, dijkstraWithTrace } from "@/algorithms";
 
   let newNodeId = 0;
   let newEdgeId = 0;
@@ -25,6 +25,8 @@
   const executionSpeed = ref();
   const executionSpeedMessage = ref();
   const orderOfVisitedNodes = ref("");
+  const dijkstraNodeCosts = ref("");
+  const selectedAlgorithm = ref("");
 
   //Edge weight for the edge currently selected
   const selectedEdgeWeight = ref("");
@@ -43,24 +45,45 @@
     canvas.value.addEventListener("mousemove", handleDrag);
   });
 
-  async function handleTraversal(algorithm: "bfs" | "dfs") {
+  async function handleTraversal(algorithm: "bfs" | "dfs" | "dijkstra") {
     if (!canvas.value) return;
     const ctx = canvas.value.getContext("2d");
     if (!ctx) return;
     if (executionSpeed.value < 0.5 || executionSpeed.value === undefined)
       executionSpeed.value = 1;
+    changeSelectedAlgorithm(algorithm);
     const adjacencyList = graphToAdjList(nodes.value, edges.value);
-    const algoFn = algorithm === "bfs" ? bfsWithTrace : dfsWithTrace;
-    const trace = algoFn(adjacencyList, selectedNodeIds.value[0]);
-    animateGraph(
-      nodes.value,
-      edges.value,
-      trace.trace,
-      ctx,
-      nodeRadius,
-      executionSpeed.value
-    );
-    orderOfVisitedNodes.value = trace.visited.toString();
+    let algoFn;
+    if (algorithm === "bfs" || algorithm === "dfs") {
+      algoFn = algorithm === "bfs" ? bfsWithTrace : dfsWithTrace;
+      const trace = algoFn(adjacencyList, selectedNodeIds.value[0]);
+      animateBFSandDFS(
+        nodes.value,
+        edges.value,
+        trace.trace,
+        ctx,
+        nodeRadius,
+        executionSpeed.value
+      );
+      orderOfVisitedNodes.value = trace.visited.toString();
+    } else {
+      algoFn = dijkstraWithTrace;
+      const trace = algoFn(nodes.value, edges.value, selectedNodeIds.value[0]);
+      await animateDijkstras(
+        nodes.value,
+        edges.value,
+        trace.trace,
+        ctx,
+        nodeRadius,
+        executionSpeed.value,
+        updateDijkstraNodeCosts
+      );
+      dijkstraNodeCosts.value = `Final Costs:\n${JSON.stringify(
+        trace.distances,
+        null,
+        2
+      )}`;
+    }
   }
 
   function speedIsValid() {
@@ -71,6 +94,18 @@
     executionSpeedMessage.value = "(Enter time in seconds)";
     return true;
   }
+
+  function changeSelectedAlgorithm(newAlgorithm: string) {
+    selectedAlgorithm.value = newAlgorithm;
+  }
+
+  const updateDijkstraNodeCosts = (
+    nodeID: number,
+    oldNodeCost: number,
+    newNodeCost: number
+  ) => {
+    dijkstraNodeCosts.value = `Node: ${nodeID.toString()} | Old Cost: ${oldNodeCost.toString()} | New Cost: ${newNodeCost.toString()}`;
+  };
 
   function handleMouseDown(event: MouseEvent) {
     const nodeIndex = getNodeIndexByCoordinates(event.offsetX, event.offsetY);
@@ -344,6 +379,12 @@
           >
             DFS
           </a>
+          <a
+            href="#"
+            @click="handleTraversal('dijkstra')"
+          >
+            Dijkstra's
+          </a>
         </div>
       </div>
       <div
@@ -390,8 +431,24 @@
           border-radius: 5px;
           margin: auto 0;
         "
+        v-if="selectedAlgorithm == 'bfs' || selectedAlgorithm == 'dfs'"
       >
         Order Visited: [{{ orderOfVisitedNodes }}]
+      </p>
+      <p
+        style="
+          background-color: #04aa6d;
+          width: px;
+          height: auto;
+          padding: 5px;
+          font-size: 20px;
+          color: white;
+          border-radius: 5px;
+          margin: auto 0;
+        "
+        v-else-if="selectedAlgorithm == 'dijkstra'"
+      >
+        {{ dijkstraNodeCosts }}
       </p>
     </div>
   </main>
