@@ -53,7 +53,7 @@
                 : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
           :style="{
-            height: `${(number +3) * 5}px`,
+            height: `${(number + 3) * 5}px`,
             transform: `translateX(${index}px)`,
           }"
         >
@@ -88,7 +88,7 @@
           {{ algorithm.label }}
         </option>
       </select>
-      <p>You selected: {{ selectedAlgorithm }}</p>
+      <p>You selected: {{ algorithms.find(algorithm => algorithm.value === selectedAlgorithm)?.label }}</p>
     </div>
   </div>
 </template>
@@ -107,7 +107,7 @@
   const array = ref<number[]>([]);
   const error = ref("");
 
-  const selectedAlgorithm = ref("");
+  const selectedAlgorithm = ref("bubbleSort");
 
   const algorithms = ref([
     { value: "bubbleSort", label: "Bubble Sort" },
@@ -119,12 +119,11 @@
   let currentRightIndex = ref<number | null>(null);
   const currentLines = ref<number[]>([]);
   const currentSortedIndex = ref<number | null>(null);
-
   const pseudoCode = ref([""]);
 
-  // Watch for changes to selectedAlgorithm dropdown
-  watch(selectedAlgorithm, (newVal) => {
-    if (newVal === "bubbleSort") {
+  // Initialize pseudoCode based on the initial selectedAlgorithm value
+  const initializePseudoCode = () => {
+    if (selectedAlgorithm.value === "bubbleSort") {
       pseudoCode.value = `do
   swapped = false
   for index = 1 to index_of_last_unsorted_element - 1
@@ -132,7 +131,7 @@
       swap(left_element, right_element)
       swapped = true;
 while swapped`.split("\n");
-    } else if (newVal === "insertionSort") {
+    } else if (selectedAlgorithm.value === "insertionSort") {
       pseudoCode.value = `do
   swapped = false
   for index = 1 to index_of_last_unsorted_element - 1
@@ -141,13 +140,21 @@ while swapped`.split("\n");
         swap(left_element, right_element)
         swapped = true;
 while swapped`.split("\n");
-    } else if (newVal === "selectionSort") {
+    } else if (selectedAlgorithm.value === "selectionSort") {
       pseudoCode.value = `for index = 0 to index_of_last_unsorted_element - 1
     find smallest unsorted element
     swap(left_element, right_element)`.split("\n");
     } else {
       pseudoCode.value = [""]; // Reset if no algorithm is selected
     }
+  };
+
+  // Call initializePseudoCode to set the initial pseudoCode
+  initializePseudoCode();
+
+  // Watch for changes to selectedAlgorithm dropdown
+  watch(selectedAlgorithm, (newVal) => {
+    initializePseudoCode();
   });
 
   const updateLeftIndex = (index: number | null) => {
@@ -345,7 +352,8 @@ while swapped`.split("\n");
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    transition: background-color 500ms, color 500ms, height 500ms;
+    transition: background-color 500ms, height 500ms, transform 500ms;
+    position: relative;
   }
 
   .pseudo-code-container {
