@@ -53,11 +53,11 @@
                 : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
           :style="{
-            height: `${number * (number / Math.max(...array)) * 7}px`,
-            width: `${array.length < 20 ? 20 : 5}px`,
+            height: `${(number +3) * 5}px`,
+            transform: `translateX(${index}px)`,
           }"
         >
-          <span v-if="array.length <= 15">{{ number }}</span>
+          <span>{{ number }}</span>
         </div>
       </div>
     </div>
@@ -332,11 +332,11 @@ while swapped`.split("\n");
     justify-content: center;
     align-items: flex-end;
     width: 1000px;
-    height: 400px;
+    height: 500px;
   }
 
   .array-bar {
-    margin: 5px;
+    width: 20px;
     padding: 10px;
     background-color: #007bff;
     border: 1px solid #ccc;
@@ -345,7 +345,7 @@ while swapped`.split("\n");
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: background-color 500ms, color 500ms, height 500ms;
   }
 
   .pseudo-code-container {
