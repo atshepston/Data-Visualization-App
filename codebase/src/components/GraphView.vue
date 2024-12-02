@@ -343,12 +343,6 @@
       >
         Remove Edge
       </button>
-      <button
-        id="clearAll"
-        @click="clearAll"
-      >
-        Clear All
-      </button>
       <input
         style="width: 80px; border: solid 1px black; border-radius: 5px"
         id="edgeWeight"
@@ -357,7 +351,19 @@
         @change="editEdgeWeight"
         placeholder="Edge Weight"
       />
-      <button @click="toggleEdgeType">Toggle directed/undirected</button>
+      <button
+        id="clearAll"
+        @click="clearAll"
+      >
+        Clear All
+      </button>
+
+      <button
+        id="toggle"
+        @click="toggleEdgeType"
+      >
+        Toggle directed/undirected
+      </button>
     </div>
     <div
       style="
@@ -456,7 +462,7 @@
     </div>
     <div
       style="
-        margin: 10px auto;
+        margin: 20px auto;
         display: flex;
         justify-content: center;
         border: solid black 2px;
@@ -535,6 +541,20 @@
     transform: scale(105%);
   }
 
+  #toggle {
+    background-color: #3c53a4;
+    border: none;
+    border-radius: 5px;
+    color: white;
+  }
+
+  #toggle:hover {
+    background-color: rgb(30, 30, 193);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    transform: scale(105%);
+  }
   .center {
     margin: auto;
     padding: 10px;
