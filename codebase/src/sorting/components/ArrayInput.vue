@@ -88,7 +88,7 @@
           {{ algorithm.label }}
         </option>
       </select>
-      <p>You selected: {{ selectedAlgorithm }}</p>
+      <!-- <p>You selected: {{ selectedAlgorithm }}</p> -->
     </div>
 
     <div class="speed-dropdown-container">
@@ -105,7 +105,7 @@
           {{ speed.label }}
         </option>
       </select>
-      <p>You selected: {{ selectedSpeed.label }}</p>
+      <!-- <p>You selected: {{ selectedSpeed.label }}</p> -->
     </div>
   </div>
 </template>
@@ -391,5 +391,19 @@ while swapped`.split("\n");
 
   .sorted-index {
     background-color: orange !important;
+  }
+
+  .algorithm-dropdown-container {
+    margin-top: 50px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-family: monospace;
+  }
+
+  .speed-dropdown-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-family: monospace;
   }
 </style>
