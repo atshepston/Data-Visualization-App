@@ -464,7 +464,17 @@
         border-radius: 10px;
       "
     >
-      <ul style="font-size: 20px">
+      <ul
+        style="
+          font-size: 20px;
+          background-color: #04aa6d;
+          box-sizing: border-box;
+          margin: 0px;
+          border-radius: 8px;
+          color: white;
+          padding: 5px 20px;
+        "
+      >
         <li>Click within the borders to create a node</li>
         <li>Double click on a node to select it</li>
         <li>Click and hold down on a node to drag it around</li>
