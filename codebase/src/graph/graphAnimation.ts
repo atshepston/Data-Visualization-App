@@ -104,6 +104,10 @@ export const animateDijkstras = async (
       }
       if (node.id === destination) nextNode = node;
     }
+    if (trace.length === 1) {
+      firstNode = nextNode;
+      nextNode.status = "exploring";
+    }
     currNode.status = "exploring";
     drawEdges(ctx, nodes, edges);
     drawNodes(nodes, {
