@@ -398,6 +398,7 @@ while swapped`.split("\n");
     margin-bottom: 20px;
     font-size: 14px;
     font-family: monospace;
+    font-weight: bold;
   }
 
   .speed-dropdown-container {
@@ -405,5 +406,12 @@ while swapped`.split("\n");
     margin-bottom: 20px;
     font-size: 14px;
     font-family: monospace;
+    font-weight: bold;
+  }
+
+  select {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    margin-left: 5px;
   }
 </style>
