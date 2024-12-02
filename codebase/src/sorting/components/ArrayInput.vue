@@ -92,26 +92,26 @@
     </div>
 
     <div class="speed-dropdown-container">
-      <label for="speed-dropdown">AlgorithmSpeed:</label>
+      <label for="speed-dropdown">Algorithm Speed:</label>
       <select
         id="speed-dropdown"
         v-model="selectedSpeed"
       >
         <option
           v-for="speed in speeds"
-          :key="speed.value"
-          :value="speed.value"
+          :key="speed.delay"
+          :value="speed"
         >
           {{ speed.label }}
         </option>
       </select>
-      <p>You selected: {{ selectedSpeed }}</p>
+      <p>You selected: {{ selectedSpeed.label }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, defineEmits, watch, computed } from "vue";
+  import { ref, watch, computed } from "vue";
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
@@ -125,28 +125,18 @@
   const error = ref("");
 
   const selectedAlgorithm = ref("");
-  const selectedSpeed = ref("intermeditate");
 
   const algorithms = ref([
     { value: "bubbleSort", label: "Bubble Sort" },
     { value: "insertionSort", label: "Insertion Sort" },
     { value: "selectionSort", label: "Selection Sort" },
   ]);
-  const speeds = ref([
-    { value: "slow", label: "Slow" },
-    { value: "intermeditate", label: "Intermediate" },
-    { value: "fast", label: "Fast" },
-  ]);
-
-  // Map speeds to milliseconds
-  const speedMap = {
-    slow: 750,
-    intermediate: 500,
-    fast: 250,
-  };
-
-  // Compute the delay based on selectedSpeed
-  const delay = computed(() => speedMap[selectedSpeed.value]);
+  const speeds = [
+    { delay: 750, label: "x0.5" },
+    { delay: 500, label: "x1" },
+    { delay: 250, label: "x1.5" },
+  ];
+  const selectedSpeed = ref(speeds[1]);
 
   let currentLeftIndex = ref<number | null>(null);
   let currentRightIndex = ref<number | null>(null);
@@ -237,23 +227,26 @@ while swapped`.split("\n");
   };
 
   const sortArray = async () => {
-    const ms = delay.value;
+    const delayInMs = selectedSpeed.value.delay;
+    console.log("selectedSpeed: " + selectedSpeed);
+    console.log("delayInMs: " + delayInMs);
+    const sortOptions = {
+      array: array.value,
+      ms: delayInMs,
+      ui: {
+        updateSwap: updateSwap,
+        updateLeftIndex: updateLeftIndex,
+        updateRightIndex: updateRightIndex,
+        setHighlightedLines: setHighlightedLines,
+        updateSortedIndex: updateSortedIndex,
+      },
+    };
     if (selectedAlgorithm.value === "bubbleSort") {
-      await bubbleSort({
-        array: array.value,
-        ms,
-        ui: {
-          updateSwap: updateSwap,
-          updateLeftIndex: updateLeftIndex,
-          updateRightIndex: updateRightIndex,
-          setHighlightedLines: setHighlightedLines,
-          updateSortedIndex: updateSortedIndex,
-        },
-      });
+      await bubbleSort(sortOptions);
     } else if (selectedAlgorithm.value === "insertionSort") {
       await insertionSort({
         array: array.value,
-        ms,
+        ms: delayInMs,
         ui: {
           updateSwap: updateSwap,
           updateLeftIndex: updateLeftIndex,
@@ -262,17 +255,7 @@ while swapped`.split("\n");
         },
       });
     } else if (selectedAlgorithm.value === "selectionSort") {
-      await selectionSort({
-        array: array.value,
-        ms,
-        ui: {
-          updateSwap: updateSwap,
-          updateLeftIndex: updateLeftIndex,
-          updateRightIndex: updateRightIndex,
-          setHighlightedLines: setHighlightedLines,
-          updateSortedIndex: updateSortedIndex,
-        },
-      });
+      await selectionSort(sortOptions);
     }
     emit("sortedArray", array.value);
     resetValue();
