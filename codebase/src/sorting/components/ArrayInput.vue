@@ -30,6 +30,19 @@
         >
           Random
         </button>
+
+        <select
+          id="algorithm-dropdown"
+          v-model="selectedAlgorithm"
+        >
+          <option
+            v-for="algorithm in algorithms"
+            :key="algorithm.value"
+            :value="algorithm.value"
+          >
+            {{ algorithm.label }}
+          </option>
+        </select>
       </form>
       <p
         v-if="error"
@@ -72,23 +85,6 @@
       >
         {{ line.trim() }}
       </div>
-    </div>
-
-    <div class="algorithm-dropdown-container">
-      <label for="algorithm-dropdown">Select Algorithm:</label>
-      <select
-        id="algorithm-dropdown"
-        v-model="selectedAlgorithm"
-      >
-        <option
-          v-for="algorithm in algorithms"
-          :key="algorithm.value"
-          :value="algorithm.value"
-        >
-          {{ algorithm.label }}
-        </option>
-      </select>
-      <p>You selected: {{ algorithms.find(algorithm => algorithm.value === selectedAlgorithm)?.label }}</p>
     </div>
   </div>
 </template>
@@ -256,6 +252,7 @@ while swapped`.split("\n");
       Math.floor(Math.random() * 50)
     );
     array.value = randomArray;
+    inputValue.value = randomArray.join(",");
   };
 
   const updateSwap = (newArray: number[]) => {
@@ -288,7 +285,7 @@ while swapped`.split("\n");
 
   input[type="text"] {
     font-size: 14px;
-    width: auto;
+    width: 225px; /* Increased the width to make the input box longer */
   }
 
   .form-styles {
@@ -310,6 +307,13 @@ while swapped`.split("\n");
     font-family: monospace;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-left: 10px;
+  }
+
+  #algorithm-dropdown {
+    font-size: 14px;
+    font-family: monospace;
+    padding: auto;
     margin-left: 10px;
   }
 
@@ -339,7 +343,7 @@ while swapped`.split("\n");
     justify-content: center;
     align-items: flex-end;
     width: 1000px;
-    height: 500px;
+    height: 300px;
   }
 
   .array-bar {
