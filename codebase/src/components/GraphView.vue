@@ -28,6 +28,7 @@
   const dijkstraNodeCosts = ref("");
   const selectedAlgorithm = ref("");
   const deletedNodeOffset = ref(0);
+  const edgeTypeToggle = ref("Directed");
 
   //Edge weight for the edge currently selected
   const selectedEdgeWeight = ref("");
@@ -86,15 +87,6 @@
         2
       )}`;
     }
-  }
-
-  function speedIsValid() {
-    if (executionSpeed.value < 0.5 && executionSpeed.value != undefined) {
-      executionSpeedMessage.value = "(Delay must be >= .5)";
-      return false;
-    }
-    executionSpeedMessage.value = "(Enter time in seconds)";
-    return true;
   }
 
   function changeSelectedAlgorithm(newAlgorithm: string) {
@@ -195,8 +187,10 @@
   function toggleEdgeType() {
     if (edgeType.value == "directed") {
       edgeType.value = "undirected";
+      edgeTypeToggle.value = "Directed";
     } else {
       edgeType.value = "directed";
+      edgeTypeToggle.value = "Undirected";
     }
     clearAll();
   }
@@ -333,98 +327,18 @@
       ></canvas>
     </div>
     <div
-      style="display: flex; gap: 10px; margin: 15px 0; justify-content: center"
-    >
-      <form @submit.prevent>
-        <input
-          style="
-            width: 70px;
-            border: solid 1px black;
-            border-radius: 5px;
-            margin-right: 10px;
-          "
-          min="0"
-          v-model="connectionNodeId1"
-          type="number"
-          placeholder="Node 1"
-        />
-        <input
-          style="
-            width: 70px;
-            border: solid 1px black;
-            border-radius: 5px;
-            margin-right: 10px;
-          "
-          min="0"
-          v-model="connectionNodeId2"
-          type="number"
-          placeholder="Node 2"
-        />
-        <div style="display: flex; flex-direction: column; margin-top: 5px">
-          <button
-            type="submit"
-            id="createEdge"
-            style="margin-right: 10px; margin-bottom: 5px"
-            @click="createNewEdge"
-          >
-            Create Edge
-          </button>
-          <button
-            id="removeEdge"
-            @click="removeEdge"
-            style="margin-right: 10px; margin-bottom: 5px"
-          >
-            Remove Edge
-          </button>
-          <button
-            id="removeNode"
-            @click="removeNode"
-            style="margin-right: 10px"
-          >
-            Remove Node
-          </button>
-        </div>
-      </form>
-
-      <input
-        style="
-          width: 80px;
-          border: solid 1px black;
-          border-radius: 5px;
-          height: 15px;
-          margin: auto 0;
-        "
-        id="edgeWeight"
-        type="number"
-        v-model="selectedEdgeWeight"
-        @change="editEdgeWeight"
-        placeholder="Edge Weight"
-      />
-      <button
-        id="clearAll"
-        @click="clearAll"
-        style="height: 20px; margin: auto 0"
-      >
-        Clear All
-      </button>
-
-      <button
-        id="toggle"
-        @click="toggleEdgeType"
-        style="height: 20px; margin: auto 0"
-      >
-        Toggle directed/undirected
-      </button>
-    </div>
-    <div
       style="
         display: flex;
-        gap: 20px;
-        margin: auto 0 auto auto;
+        gap: 10px;
+        margin: 0 0;
         justify-content: center;
+        padding: 10px;
       "
     >
-      <div class="dropdown">
+      <div
+        class="dropdown"
+        style="margin: auto 0"
+      >
         <button class="dropbtn">Algorithms</button>
         <div class="dropdown-content">
           <a
@@ -447,6 +361,64 @@
           </a>
         </div>
       </div>
+      <form
+        @submit.prevent
+        style="margin: auto 0"
+      >
+        <input
+          style="
+            width: 60px;
+            border: solid 1px black;
+            border-radius: 5px;
+            margin-right: 10px;
+          "
+          min="0"
+          v-model="connectionNodeId1"
+          type="number"
+          placeholder="Node 1"
+          id="nodeInput1"
+        />
+        <input
+          style="width: 60px; border: solid 1px black; border-radius: 5px"
+          min="0"
+          v-model="connectionNodeId2"
+          type="number"
+          placeholder="Node 2"
+        />
+        <div style="display: flex; flex-direction: column; margin-top: 3px">
+          <button
+            type="submit"
+            id="createEdge"
+            @click="createNewEdge"
+          >
+            Create Edge
+          </button>
+        </div>
+      </form>
+      <div
+        class="removeButtons"
+        style="
+          display: flex;
+          flex-direction: column;
+          margin: auto 0;
+          justify-content: center;
+        "
+      >
+        <button
+          id="removeEdge"
+          @click="removeEdge"
+          style="margin-bottom: 5px"
+        >
+          Remove Edge
+        </button>
+        <button
+          id="removeNode"
+          @click="removeNode"
+        >
+          Remove Node
+        </button>
+      </div>
+
       <div
         style="
           display: flex;
@@ -457,7 +429,21 @@
       >
         <input
           style="
-            width: 70px;
+            width: 95px;
+            border: solid 1px black;
+            border-radius: 5px;
+            height: 15px;
+            margin: auto 0;
+          "
+          id="edgeWeight"
+          type="number"
+          v-model="selectedEdgeWeight"
+          @change="editEdgeWeight"
+          placeholder="Edge Weight"
+        />
+        <input
+          style="
+            width: 95px;
             margin: auto;
             border: solid 1px black;
             border-radius: 5px;
@@ -467,19 +453,40 @@
           placeholder="Delay (s)"
           v-model="executionSpeed"
         />
-        <label
-          v-if="speedIsValid()"
-          style="font-size: 13px"
-        >
-          {{ executionSpeedMessage }}
-        </label>
-        <label
-          v-else
-          style="font-size: 13px"
-        >
-          {{ executionSpeedMessage }}
-        </label>
       </div>
+      <div
+        style="
+          display: flex;
+          height: 50px;
+          flex-direction: column;
+          margin: auto 0;
+        "
+      >
+        <button
+          id="clearAll"
+          @click="clearAll"
+          style="height: 20px; margin: auto 0"
+        >
+          Clear All
+        </button>
+
+        <button
+          id="toggle"
+          @click="toggleEdgeType"
+          style="height: 20px; margin: auto 0"
+        >
+          {{ edgeTypeToggle }}
+        </button>
+      </div>
+    </div>
+    <div
+      style="
+        display: flex;
+        gap: 20px;
+        margin: auto 0 auto auto;
+        justify-content: center;
+      "
+    >
       <p
         style="
           background-color: #04aa6d;
@@ -537,13 +544,21 @@
         <li>Click and hold down on a node to drag it around</li>
         <li>
           To add or remove an edge between two nodes, enter the node values and
-          press the corresponding button
+          press the corresponding button or press enter
+        </li>
+        <li>
+          To edit an edge weight, click on the edge and enter a new value in the
+          input box
         </li>
         <li>
           When toggling between directed and undirected edges, the graph will
           clear
         </li>
         <li>To delete the graph, select "Clear All"</li>
+        <li>
+          To change the speed of the animation, enter a number (in seconds) in
+          the delay input box greater than .5
+        </li>
       </ul>
     </div>
   </main>
@@ -629,16 +644,18 @@
   .dropbtn {
     background-color: #04aa6d;
     color: white;
-    padding: 16px;
+    padding: 10px;
+    margin: auto 0;
     font-size: 16px;
     border: none;
     border-radius: 5px;
+    height: 41px;
   }
 
   /* The container <div> - needed to position the dropdown content */
   .dropdown {
     display: inline-block;
-    height: 50px;
+    height: auto;
   }
 
   /* Dropdown Content (Hidden by Default) */
