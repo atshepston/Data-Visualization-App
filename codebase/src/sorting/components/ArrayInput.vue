@@ -89,22 +89,10 @@
         </option>
       </select>
     </div>
-
-    <div class="playback-speed-container">
-      <label for="playback-speed">Playback Speed:</label>
-      <select
-        id="playback-speed"
-        v-model="selectedSpeed"
-      >
-        <option
-          v-for="speed in speeds"
-          :key="speed.delay"
-          :value="speed"
-        >
-          {{ speed.label }}
-        </option>
-      </select>
-    </div>
+    <PlaybackSpeed
+      :speeds="speeds"
+      v-model="selectedSpeed"
+    />
   </div>
 </template>
 
@@ -113,6 +101,7 @@
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
+  import PlaybackSpeed from "./PlaybackSpeed.vue";
 
   const emit = defineEmits<{
     (event: "sortedArray", value: number[]): void;
@@ -391,14 +380,6 @@ while swapped`.split("\n");
 
   .algorithm-dropdown-container {
     margin-top: 50px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    font-family: monospace;
-    font-weight: bold;
-  }
-
-  .playback-speed-container {
-    margin-top: 20px;
     margin-bottom: 20px;
     font-size: 14px;
     font-family: monospace;
