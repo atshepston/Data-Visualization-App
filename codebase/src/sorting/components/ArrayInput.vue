@@ -91,10 +91,10 @@
       <!-- <p>You selected: {{ selectedAlgorithm }}</p> -->
     </div>
 
-    <div class="speed-dropdown-container">
-      <label for="speed-dropdown">Algorithm Speed:</label>
+    <div class="playback-speed-container">
+      <label for="playback-speed">Playback Speed:</label>
       <select
-        id="speed-dropdown"
+        id="playback-speed"
         v-model="selectedSpeed"
       >
         <option
@@ -401,7 +401,7 @@ while swapped`.split("\n");
     font-weight: bold;
   }
 
-  .speed-dropdown-container {
+  .playback-speed-container {
     margin-top: 20px;
     margin-bottom: 20px;
     font-size: 14px;
