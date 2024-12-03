@@ -88,7 +88,6 @@
           {{ algorithm.label }}
         </option>
       </select>
-      <!-- <p>You selected: {{ selectedAlgorithm }}</p> -->
     </div>
 
     <div class="playback-speed-container">
@@ -105,7 +104,6 @@
           {{ speed.label }}
         </option>
       </select>
-      <!-- <p>You selected: {{ selectedSpeed.label }}</p> -->
     </div>
   </div>
 </template>
@@ -228,8 +226,6 @@ while swapped`.split("\n");
 
   const sortArray = async () => {
     const delayInMs = selectedSpeed.value.delay;
-    console.log("selectedSpeed: " + selectedSpeed);
-    console.log("delayInMs: " + delayInMs);
     const sortOptions = {
       array: array.value,
       ms: delayInMs,
