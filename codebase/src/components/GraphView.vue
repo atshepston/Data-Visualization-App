@@ -27,6 +27,7 @@
   const orderOfVisitedNodes = ref("");
   const dijkstraNodeCosts = ref("");
   const selectedAlgorithm = ref("");
+  const deletedNodeOffset = ref(0);
 
   //Edge weight for the edge currently selected
   const selectedEdgeWeight = ref("");
@@ -170,7 +171,7 @@
   }
 
   function getNodeIndexByCoordinates(x: number, y: number) {
-    for (let i = 0; i < newNodeId; i++) {
+    for (let i = 0; i < newNodeId - deletedNodeOffset.value; i++) {
       let cur = nodes.value[i];
 
       if ((x - cur.x) ** 2 + (y - cur.y) ** 2 <= nodeRadius ** 2) {
@@ -278,6 +279,21 @@
     redraw();
   }
 
+  function removeNode() {
+    const nodeToBeRemoved = selectedNodeIds.value[0];
+    if (nodeToBeRemoved == null) return;
+    console.log(nodeToBeRemoved);
+    const newNodes = nodes.value.filter((node) => node.id !== nodeToBeRemoved);
+    const newEdges = edges.value.filter(
+      (edge) => edge.from !== nodeToBeRemoved && edge.to !== nodeToBeRemoved
+    );
+    selectedNodeIds.value = [];
+    deletedNodeOffset.value++;
+    nodes.value = newNodes;
+    edges.value = newEdges;
+    redraw();
+  }
+
   function clearAll() {
     if (canvas.value) {
       newNodeId = 0;
@@ -285,6 +301,7 @@
       nodes.value = [];
       selectedNodeIds.value = [];
       edges.value = [];
+      deletedNodeOffset.value = 0;
       orderOfVisitedNodes.value = "Create a new graph";
       dijkstraNodeCosts.value = "Create a new graph";
       redraw();
@@ -302,6 +319,7 @@
         border: '1px solid black',
         position: 'relative',
         margin: 'auto',
+        background: '#eeee',
       }"
     >
       <canvas
@@ -317,34 +335,65 @@
     <div
       style="display: flex; gap: 10px; margin: 15px 0; justify-content: center"
     >
+      <form @submit.prevent>
+        <input
+          style="
+            width: 70px;
+            border: solid 1px black;
+            border-radius: 5px;
+            margin-right: 10px;
+          "
+          min="0"
+          v-model="connectionNodeId1"
+          type="number"
+          placeholder="Node 1"
+        />
+        <input
+          style="
+            width: 70px;
+            border: solid 1px black;
+            border-radius: 5px;
+            margin-right: 10px;
+          "
+          min="0"
+          v-model="connectionNodeId2"
+          type="number"
+          placeholder="Node 2"
+        />
+        <div style="display: flex; flex-direction: column; margin-top: 5px">
+          <button
+            type="submit"
+            id="createEdge"
+            style="margin-right: 10px; margin-bottom: 5px"
+            @click="createNewEdge"
+          >
+            Create Edge
+          </button>
+          <button
+            id="removeEdge"
+            @click="removeEdge"
+            style="margin-right: 10px; margin-bottom: 5px"
+          >
+            Remove Edge
+          </button>
+          <button
+            id="removeNode"
+            @click="removeNode"
+            style="margin-right: 10px"
+          >
+            Remove Node
+          </button>
+        </div>
+      </form>
+
       <input
-        style="width: 70px; border: solid 1px black; border-radius: 5px"
-        min="0"
-        v-model="connectionNodeId1"
-        type="number"
-        placeholder="Node 1"
-      />
-      <input
-        style="width: 70px; border: solid 1px black; border-radius: 5px"
-        min="0"
-        v-model="connectionNodeId2"
-        type="number"
-        placeholder="Node 2"
-      />
-      <button
-        id="createEdge"
-        @click="createNewEdge"
-      >
-        Create Edge
-      </button>
-      <button
-        id="removeEdge"
-        @click="removeEdge"
-      >
-        Remove Edge
-      </button>
-      <input
-        style="width: 80px; border: solid 1px black; border-radius: 5px"
+        style="
+          width: 80px;
+          border: solid 1px black;
+          border-radius: 5px;
+          height: 15px;
+          margin: auto 0;
+        "
         id="edgeWeight"
         type="number"
         v-model="selectedEdgeWeight"
@@ -354,6 +403,7 @@
       <button
         id="clearAll"
         @click="clearAll"
+        style="height: 20px; margin: auto 0"
       >
         Clear All
       </button>
@@ -361,6 +411,7 @@
       <button
         id="toggle"
         @click="toggleEdgeType"
+        style="height: 20px; margin: auto 0"
       >
         Toggle directed/undirected
       </button>
@@ -505,6 +556,13 @@
     color: white;
   }
 
+  #removeNode {
+    background-color: rgba(255, 0, 0, 0.6);
+    border: none;
+    border-radius: 5px;
+    color: white;
+  }
+
   #createEdge {
     background-color: #04aa6d;
     border: none;
@@ -528,6 +586,13 @@
   }
 
   #removeEdge:hover {
+    background-color: rgb(193, 30, 30);
+    border: none;
+    border-radius: 5px;
+    transform: scale(105%);
+  }
+
+  #removeNode:hover {
     background-color: rgb(193, 30, 30);
     border: none;
     border-radius: 5px;
