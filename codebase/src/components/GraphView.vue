@@ -23,7 +23,6 @@
   const canvas = ref<HTMLCanvasElement>();
   const draggingNode = ref<GNode>();
   const executionSpeed = ref();
-  const executionSpeedMessage = ref();
   const orderOfVisitedNodes = ref("");
   const dijkstraNodeCosts = ref("");
   const selectedAlgorithm = ref("");
@@ -298,6 +297,9 @@
       deletedNodeOffset.value = 0;
       orderOfVisitedNodes.value = "Create a new graph";
       dijkstraNodeCosts.value = "Create a new graph";
+      selectedEdgeWeight.value = "";
+      connectionNodeId1.value = "";
+      connectionNodeId2.value = "";
       redraw();
     }
   }
