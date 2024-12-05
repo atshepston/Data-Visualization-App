@@ -333,7 +333,6 @@
   function removeNode() {
     const nodeToBeRemoved = selectedNodeIds.value[0];
     if (nodeToBeRemoved == null) return;
-    console.log(nodeToBeRemoved);
     const newNodes = nodes.value.filter((node) => node.id !== nodeToBeRemoved);
     const newEdges = edges.value.filter(
       (edge) => edge.from !== nodeToBeRemoved && edge.to !== nodeToBeRemoved

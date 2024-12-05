@@ -101,29 +101,40 @@ export function dijkstraWithTrace(
 
     if (visited.includes(currentNode)) continue;
     visited.push(currentNode);
-
     // Update distances for all neighbors
-    const neighbors = edges.filter((edge) => edge.from === currentNode);
+    const neighbors = edges.filter(
+      (edge) =>
+        edge.from === currentNode ||
+        (edge.type === "undirected" && edge.to === currentNode)
+    );
     for (const edge of neighbors) {
-      const neighbor = edge.to;
+      const neighbor =
+        edge.type === "directed"
+          ? edge.to
+          : edge.to === currentNode
+          ? edge.from
+          : edge.to;
       if (!visited.includes(neighbor)) {
         const newDistance = currentDistance + edge.weight;
         if (newDistance < distances[neighbor]) {
           const oldDistance = distances[neighbor];
           distances[neighbor] = newDistance;
           priorityQueue.push([neighbor, newDistance]);
-          trace.push([edge.from, edge.to, oldDistance, newDistance]);
+          const [originNode, destinationNode] =
+            edge.from === currentNode
+              ? [edge.from, edge.to]
+              : [edge.to, edge.from];
+          trace.push([originNode, destinationNode, oldDistance, newDistance]);
         } else {
-          trace.push([
-            currentNode,
-            edge.to,
-            distances[neighbor],
-            distances[neighbor],
-          ]);
+          // trace.push([
+          //   currentNode,
+          //   edge.to,
+          //   distances[neighbor],
+          //   distances[neighbor],
+          // ]);
         }
       }
     }
   }
-
   return { trace, distances };
 }

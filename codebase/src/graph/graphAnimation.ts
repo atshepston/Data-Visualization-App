@@ -96,7 +96,7 @@ export const animateDijkstras = async (
   let firstNode;
   updateDijkstraNodeCosts(trace[0][1], 0, 0);
   for (let i = 0; i < trace.length; ++i) {
-    let [source, destination, newDistances] = trace[i];
+    let [source, destination, oldDistance, newDistance] = trace[i];
     for (const node of nodes) {
       if (node.id === source) {
         currNode = node;
@@ -114,7 +114,7 @@ export const animateDijkstras = async (
       nodeRadius,
       ctx,
     });
-    await visualizationDelay(delayDuration * 1000);
+    if (i > 0) await visualizationDelay(delayDuration * 1000);
 
     nextNode.status = "exploring";
     drawEdges(ctx, nodes, edges);
@@ -122,7 +122,7 @@ export const animateDijkstras = async (
       nodeRadius,
       ctx,
     });
-    updateDijkstraNodeCosts(destination, trace[i][2], trace[i][3]);
+    updateDijkstraNodeCosts(destination, oldDistance, newDistance);
     await visualizationDelay(delayDuration * 1000);
 
     currNode.status = "explored";
