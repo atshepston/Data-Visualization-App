@@ -3,9 +3,9 @@
   import { drawNodes } from "./node";
   import { drawEdges } from "./edge";
   import type { GNode, GEdge } from "../graph/types";
-  import { animateGraph } from "@/graph/graphAnimation";
+  import { animateBFSandDFS, animateDijkstras } from "@/graph/graphAnimation";
   import { graphToAdjList } from "@/converters";
-  import { bfsWithTrace, dfsWithTrace } from "@/algorithms";
+  import { bfsWithTrace, dfsWithTrace, dijkstraWithTrace } from "@/algorithms";
 
   let newNodeId = 0;
   let newEdgeId = 0;
@@ -23,8 +23,11 @@
   const canvas = ref<HTMLCanvasElement>();
   const draggingNode = ref<GNode>();
   const executionSpeed = ref();
-  const executionSpeedMessage = ref();
   const orderOfVisitedNodes = ref("");
+  const dijkstraNodeCosts = ref("");
+  const selectedAlgorithm = ref("");
+  const deletedNodeOffset = ref(0);
+  const edgeTypeToggle = ref("Directed");
 
   //Edge weight for the edge currently selected
   const edgeType = ref<"directed" | "undirected">("undirected");
@@ -44,34 +47,59 @@
     canvas.value.addEventListener("mousemove", handleDrag);
   });
 
-  async function handleTraversal(algorithm: "bfs" | "dfs") {
+  async function handleTraversal(algorithm: "bfs" | "dfs" | "dijkstra") {
     if (!canvas.value) return;
     const ctx = canvas.value.getContext("2d");
     if (!ctx) return;
     if (executionSpeed.value < 0.5 || executionSpeed.value === undefined)
       executionSpeed.value = 1;
+    changeSelectedAlgorithm(algorithm);
     const adjacencyList = graphToAdjList(nodes.value, edges.value);
-    const algoFn = algorithm === "bfs" ? bfsWithTrace : dfsWithTrace;
-    const trace = algoFn(adjacencyList, selectedNodeIds.value[0]);
-    animateGraph(
-      nodes.value,
-      edges.value,
-      trace.trace,
-      ctx,
-      nodeRadius,
-      executionSpeed.value
-    );
-    orderOfVisitedNodes.value = trace.visited.toString();
+    let algoFn;
+    if (algorithm === "bfs" || algorithm === "dfs") {
+      algoFn = algorithm === "bfs" ? bfsWithTrace : dfsWithTrace;
+      const trace = algoFn(adjacencyList, selectedNodeIds.value[0]);
+      animateBFSandDFS(
+        nodes.value,
+        edges.value,
+        trace.trace,
+        ctx,
+        nodeRadius,
+        executionSpeed.value
+      );
+      orderOfVisitedNodes.value =
+        "Order Visited: [" + trace.visited.toString() + "]";
+    } else {
+      algoFn = dijkstraWithTrace;
+      const trace = algoFn(nodes.value, edges.value, selectedNodeIds.value[0]);
+      await animateDijkstras(
+        nodes.value,
+        edges.value,
+        trace.trace,
+        ctx,
+        nodeRadius,
+        executionSpeed.value,
+        updateDijkstraNodeCosts
+      );
+      dijkstraNodeCosts.value = `Final Costs:\n${JSON.stringify(
+        trace.distances,
+        null,
+        2
+      )}`;
+    }
   }
 
-  function speedIsValid() {
-    if (executionSpeed.value < 0.5 && executionSpeed.value != undefined) {
-      executionSpeedMessage.value = "(Delay must be >= .5)";
-      return false;
-    }
-    executionSpeedMessage.value = "(Enter time in seconds)";
-    return true;
+  function changeSelectedAlgorithm(newAlgorithm: string) {
+    selectedAlgorithm.value = newAlgorithm;
   }
+
+  const updateDijkstraNodeCosts = (
+    nodeID: number,
+    oldNodeCost: number,
+    newNodeCost: number
+  ) => {
+    dijkstraNodeCosts.value = `Node: ${nodeID.toString()} | Old Cost: ${oldNodeCost.toString()} | New Cost: ${newNodeCost.toString()}`;
+  };
 
   function handleMouseDown(event: MouseEvent) {
     const nodeIndex = getNodeIndexByCoordinates(event.offsetX, event.offsetY);
@@ -150,7 +178,7 @@
   }
 
   function getNodeIndexByCoordinates(x: number, y: number) {
-    for (let i = 0; i < newNodeId; i++) {
+    for (let i = 0; i < newNodeId - deletedNodeOffset.value; i++) {
       let cur = nodes.value[i];
 
       if ((x - cur.x) ** 2 + (y - cur.y) ** 2 <= nodeRadius ** 2) {
@@ -239,8 +267,10 @@
   function toggleEdgeType() {
     if (edgeType.value == "directed") {
       edgeType.value = "undirected";
+      edgeTypeToggle.value = "Directed";
     } else {
       edgeType.value = "directed";
+      edgeTypeToggle.value = "Undirected";
     }
     clearAll();
   }
@@ -300,6 +330,21 @@
     redraw();
   }
 
+  function removeNode() {
+    const nodeToBeRemoved = selectedNodeIds.value[0];
+    if (nodeToBeRemoved == null) return;
+    console.log(nodeToBeRemoved);
+    const newNodes = nodes.value.filter((node) => node.id !== nodeToBeRemoved);
+    const newEdges = edges.value.filter(
+      (edge) => edge.from !== nodeToBeRemoved && edge.to !== nodeToBeRemoved
+    );
+    selectedNodeIds.value = [];
+    deletedNodeOffset.value++;
+    nodes.value = newNodes;
+    edges.value = newEdges;
+    redraw();
+  }
+
   function clearAll() {
     if (canvas.value) {
       newNodeId = 0;
@@ -307,6 +352,12 @@
       nodes.value = [];
       selectedNodeIds.value = [];
       edges.value = [];
+      deletedNodeOffset.value = 0;
+      orderOfVisitedNodes.value = "Create a new graph";
+      dijkstraNodeCosts.value = "Create a new graph";
+      selectedEdgeWeight.value = "";
+      connectionNodeId1.value = "";
+      connectionNodeId2.value = "";
       redraw();
     }
   }
@@ -322,6 +373,7 @@
         border: '1px solid black',
         position: 'relative',
         margin: 'auto',
+        background: '#eeee',
       }"
     >
       <canvas
@@ -335,6 +387,7 @@
       ></canvas>
     </div>
     <div
+
       style="display: flex; gap: 10px; margin: 15px 0; justify-content: center"
     >
       <input
@@ -382,12 +435,16 @@
     <div
       style="
         display: flex;
-        gap: 20px;
-        margin: auto 0 auto auto;
+        gap: 10px;
+        margin: 0 0;
         justify-content: center;
+        padding: 10px;
       "
     >
-      <div class="dropdown">
+      <div
+        class="dropdown"
+        style="margin: auto 0"
+      >
         <button class="dropbtn">Algorithms</button>
         <div class="dropdown-content">
           <a
@@ -402,8 +459,72 @@
           >
             DFS
           </a>
+          <a
+            href="#"
+            @click="handleTraversal('dijkstra')"
+          >
+            Dijkstra's
+          </a>
         </div>
       </div>
+      <form
+        @submit.prevent
+        style="margin: auto 0"
+      >
+        <input
+          style="
+            width: 60px;
+            border: solid 1px black;
+            border-radius: 5px;
+            margin-right: 10px;
+          "
+          min="0"
+          v-model="connectionNodeId1"
+          type="number"
+          placeholder="Node 1"
+          id="nodeInput1"
+        />
+        <input
+          style="width: 60px; border: solid 1px black; border-radius: 5px"
+          min="0"
+          v-model="connectionNodeId2"
+          type="number"
+          placeholder="Node 2"
+        />
+        <div style="display: flex; flex-direction: column; margin-top: 3px">
+          <button
+            type="submit"
+            id="createEdge"
+            @click="createNewEdge"
+          >
+            Create Edge
+          </button>
+        </div>
+      </form>
+      <div
+        class="removeButtons"
+        style="
+          display: flex;
+          flex-direction: column;
+          margin: auto 0;
+          justify-content: center;
+        "
+      >
+        <button
+          id="removeEdge"
+          @click="removeEdge"
+          style="margin-bottom: 5px"
+        >
+          Remove Edge
+        </button>
+        <button
+          id="removeNode"
+          @click="removeNode"
+        >
+          Remove Node
+        </button>
+      </div>
+
       <div
         style="
           display: flex;
@@ -414,7 +535,21 @@
       >
         <input
           style="
-            width: 70px;
+            width: 95px;
+            border: solid 1px black;
+            border-radius: 5px;
+            height: 15px;
+            margin: auto 0;
+          "
+          id="edgeWeight"
+          type="number"
+          v-model="selectedEdgeWeight"
+          @change="editEdgeWeight"
+          placeholder="Edge Weight"
+        />
+        <input
+          style="
+            width: 95px;
             margin: auto;
             border: solid 1px black;
             border-radius: 5px;
@@ -424,19 +559,40 @@
           placeholder="Delay (s)"
           v-model="executionSpeed"
         />
-        <label
-          v-if="speedIsValid()"
-          style="font-size: 13px"
-        >
-          {{ executionSpeedMessage }}
-        </label>
-        <label
-          v-else
-          style="font-size: 13px"
-        >
-          {{ executionSpeedMessage }}
-        </label>
       </div>
+      <div
+        style="
+          display: flex;
+          height: 50px;
+          flex-direction: column;
+          margin: auto 0;
+        "
+      >
+        <button
+          id="clearAll"
+          @click="clearAll"
+          style="height: 20px; margin: auto 0"
+        >
+          Clear All
+        </button>
+
+        <button
+          id="toggle"
+          @click="toggleEdgeType"
+          style="height: 20px; margin: auto 0"
+        >
+          {{ edgeTypeToggle }}
+        </button>
+      </div>
+    </div>
+    <div
+      style="
+        display: flex;
+        gap: 20px;
+        margin: auto 0 auto auto;
+        justify-content: center;
+      "
+    >
       <p
         style="
           background-color: #04aa6d;
@@ -448,14 +604,80 @@
           border-radius: 5px;
           margin: auto 0;
         "
+        v-if="selectedAlgorithm == 'bfs' || selectedAlgorithm == 'dfs'"
       >
-        Order Visited: [{{ orderOfVisitedNodes }}]
+        {{ orderOfVisitedNodes }}
       </p>
+      <p
+        style="
+          background-color: #04aa6d;
+          width: px;
+          height: auto;
+          padding: 5px;
+          font-size: 20px;
+          color: white;
+          border-radius: 5px;
+          margin: auto 0;
+        "
+        v-else-if="selectedAlgorithm == 'dijkstra'"
+      >
+        {{ dijkstraNodeCosts }}
+      </p>
+    </div>
+    <div
+      style="
+        margin: 20px auto;
+        display: flex;
+        justify-content: center;
+        border: solid black 2px;
+        max-width: 800px;
+        border-radius: 10px;
+      "
+    >
+      <ul
+        style="
+          font-size: 20px;
+          background-color: #04aa6d;
+          box-sizing: border-box;
+          margin: 0px;
+          border-radius: 8px;
+          color: white;
+          padding: 5px 20px;
+        "
+      >
+        <li>Click within the borders to create a node</li>
+        <li>Double click on a node to select it</li>
+        <li>Click and hold down on a node to drag it around</li>
+        <li>
+          To add or remove an edge between two nodes, enter the node values and
+          press the corresponding button or press enter
+        </li>
+        <li>
+          To edit an edge weight, click on the edge and enter a new value in the
+          input box
+        </li>
+        <li>
+          When toggling between directed and undirected edges, the graph will
+          clear
+        </li>
+        <li>To delete the graph, select "Clear All"</li>
+        <li>
+          To change the speed of the animation, enter a number (in seconds) in
+          the delay input box greater than .5
+        </li>
+      </ul>
     </div>
   </main>
 </template>
 <style scoped>
   #removeEdge {
+    background-color: rgba(255, 0, 0, 0.6);
+    border: none;
+    border-radius: 5px;
+    color: white;
+  }
+
+  #removeNode {
     background-color: rgba(255, 0, 0, 0.6);
     border: none;
     border-radius: 5px;
@@ -491,6 +713,13 @@
     transform: scale(105%);
   }
 
+  #removeNode:hover {
+    background-color: rgb(193, 30, 30);
+    border: none;
+    border-radius: 5px;
+    transform: scale(105%);
+  }
+
   #createEdge:hover {
     background-color: #3e8e41;
     border: none;
@@ -498,6 +727,20 @@
     transform: scale(105%);
   }
 
+  #toggle {
+    background-color: #3c53a4;
+    border: none;
+    border-radius: 5px;
+    color: white;
+  }
+
+  #toggle:hover {
+    background-color: rgb(30, 30, 193);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    transform: scale(105%);
+  }
   .center {
     margin: auto;
     padding: 10px;
@@ -507,16 +750,18 @@
   .dropbtn {
     background-color: #04aa6d;
     color: white;
-    padding: 16px;
+    padding: 10px;
+    margin: auto 0;
     font-size: 16px;
     border: none;
     border-radius: 5px;
+    height: 41px;
   }
 
   /* The container <div> - needed to position the dropdown content */
   .dropdown {
     display: inline-block;
-    height: 50px;
+    height: auto;
   }
 
   /* Dropdown Content (Hidden by Default) */
