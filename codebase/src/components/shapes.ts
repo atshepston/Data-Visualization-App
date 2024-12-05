@@ -89,14 +89,6 @@ export type EdgeOptions = {
   width: number;
 };
 
-const drawLine = (options: LineOptions) => (ctx: CanvasRenderingContext2D) => {
-  ctx.beginPath();
-  ctx.lineWidth = options.width;
-  ctx.strokeStyle = options.color;
-  ctx.moveTo(options.x1, options.x2);
-  ctx.lineTo(options.x2, options.y2);
-  ctx.stroke();
-};
 //default width should be 3
 export const drawEdge =
   (options: EdgeOptions) => (ctx: CanvasRenderingContext2D) => {

@@ -35,6 +35,7 @@
     if (!canvas.value) {
       return;
     }
+    canvas.value.addEventListener("dblclick", handleDoubleClick);
     canvas.value.addEventListener("mousedown", handleMouseDown);
     canvas.value.addEventListener("mouseup", () => {
       draggingNode.value = undefined;
@@ -86,12 +87,14 @@
 
   function handleClick(event: MouseEvent) {
     const { offsetX: x, offsetY: y } = event;
+    if (selectedEdge.value) {
+      selectedEdge.value.status = "default";
+    }
 
     // if nothing is intersecting, add a new node
     const nodeIndex = getNodeIndexByCoordinates(x, y);
     const edgeIndex = getEdgeIndexByCoordinates(x, y);
     if (edgeIndex != -1) {
-      selectedEdge.value = edges.value[edgeIndex];
       return;
     }
     if (nodeIndex != -1) return;
@@ -106,6 +109,34 @@
     redraw();
   }
 
+  function handleDoubleClick(event: MouseEvent) {
+    const { offsetX: x, offsetY: y } = event;
+    const index = getNodeIndexByCoordinates(x, y);
+    const edgeIndex = getEdgeIndexByCoordinates(x, y);
+    if (selectedEdge.value) {
+      selectedEdge.value.status = "default";
+    }
+    if (edgeIndex != -1) {
+      selectedEdge.value = edges.value[edgeIndex];
+      selectedEdge.value.status = "selected";
+      return;
+    }
+    if (index === -1) return;
+    const node = nodes.value[index];
+    selectedNodeIds.value.push(node.id);
+    node.status = "selected";
+    if (selectedNodeIds.value.length !== 2) return;
+    const [selectedNode1, selectedNode2] = selectedNodeIds.value;
+    //addEdge(selectedNode1, selectedNode2);
+
+    for (let i = 0; i < nodes.value.length; i++) {
+      if ((nodes.value[i].status = "selected")) {
+        nodes.value[i].status = "default";
+      }
+    }
+    selectedNodeIds.value = [];
+  }
+
   function addEdge(fromNodeId: GNode["id"], toNodeId: GNode["id"]) {
     edges.value.push({
       id: newEdgeId,
@@ -113,7 +144,7 @@
       to: toNodeId,
       type: edgeType.value,
       weight: 1,
-      status: "selected",
+      status: "default",
     });
     newEdgeId += 1;
   }
@@ -129,6 +160,7 @@
     return -1;
   }
 
+  // TODO: Change hitbox so it doesn't overlap node
   function getEdgeIndexByCoordinates(x: number, y: number) {
     for (let i = 0; i < edges.value.length; i++) {
       let edge = edges.value[i];
@@ -151,15 +183,20 @@
         return -1;
       }
       const rad = Math.atan2(fromY - toY, fromX - toX);
+
+      const startX = 30 * Math.cos(rad) + fromX;
+      const startY = 30 * Math.sin(rad) + fromY;
+      const endX = 30 * Math.cos(rad) + toX;
+      const endY = 30 * Math.sin(rad) + toY;
       const distFromEdge = 15;
-      const x1 = distFromEdge * Math.cos(rad + Math.PI / 2) + fromX;
-      const y1 = distFromEdge * Math.sin(rad + Math.PI / 2) + fromY;
-      const x2 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + fromX;
-      const y2 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + fromY;
-      const x3 = distFromEdge * Math.cos(rad + Math.PI / 2) + toX;
-      const y3 = distFromEdge * Math.sin(rad + Math.PI / 2) + toY;
-      const x4 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + toX;
-      const y4 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + toY;
+      const x1 = distFromEdge * Math.cos(rad + Math.PI / 2) + startX;
+      const y1 = distFromEdge * Math.sin(rad + Math.PI / 2) + startY;
+      const x2 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + startX;
+      const y2 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + startY;
+      const x3 = distFromEdge * Math.cos(rad + Math.PI / 2) + endX;
+      const y3 = distFromEdge * Math.sin(rad + Math.PI / 2) + endY;
+      const x4 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + endX;
+      const y4 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + endY;
       const rectArea =
         calcArea(x1, y1, x2, y2, x3, y3) + calcArea(x1, y1, x4, y4, x3, y3);
       const APD = calcArea(x1, y1, x, y, x4, y4);
