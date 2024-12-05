@@ -355,7 +355,7 @@
       deletedNodeOffset.value = 0;
       orderOfVisitedNodes.value = "Create a new graph";
       dijkstraNodeCosts.value = "Create a new graph";
-      selectedEdgeWeight.value = "";
+      selectedEdge.value = undefined;
       connectionNodeId1.value = "";
       connectionNodeId2.value = "";
       redraw();
@@ -385,52 +385,6 @@
         width="1000"
         height="500"
       ></canvas>
-    </div>
-    <div
-
-      style="display: flex; gap: 10px; margin: 15px 0; justify-content: center"
-    >
-      <input
-        style="width: 70px; border: solid 1px black; border-radius: 5px"
-        min="0"
-        v-model="connectionNodeId1"
-        type="number"
-        placeholder="Node 1"
-      />
-      <input
-        style="width: 70px; border: solid 1px black; border-radius: 5px"
-        min="0"
-        v-model="connectionNodeId2"
-        type="number"
-        placeholder="Node 2"
-      />
-      <button
-        id="createEdge"
-        @click="createNewEdge"
-      >
-        Create Edge
-      </button>
-      <button
-        id="removeEdge"
-        @click="removeEdge"
-      >
-        Remove Edge
-      </button>
-      <button
-        id="clearAll"
-        @click="clearAll"
-      >
-        Clear All
-      </button>
-      <input
-        style="width: 80px; border: solid 1px black; border-radius: 5px"
-        id="edgeWeight"
-        type="number"
-        v-model="newWeight"
-        @change="editEdgeWeight"
-        placeholder="Edge Weight"
-      />
-      <button @click="toggleEdgeType">Toggle directed/undirected</button>
     </div>
     <div
       style="
@@ -543,7 +497,7 @@
           "
           id="edgeWeight"
           type="number"
-          v-model="selectedEdgeWeight"
+          v-model="newWeight"
           @change="editEdgeWeight"
           placeholder="Edge Weight"
         />
