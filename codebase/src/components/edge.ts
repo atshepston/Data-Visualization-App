@@ -1,5 +1,6 @@
 import { graphToAdjList } from "@/converters";
 import type { GEdge, GNode } from "../graph/types";
+import { STATUS_TO_COLOR } from "../graph/types";
 const CIRCLER = 30;
 
 export function drawEdges(
@@ -78,7 +79,7 @@ function drawSelfEdge(
   const cy2 = startY + SF * Math.sin(rad) - SF * Math.cos(rad);
 
   ctx.beginPath();
-  ctx.strokeStyle = edge.status;
+  ctx.strokeStyle = STATUS_TO_COLOR[edge.status];
   ctx.lineWidth = 3;
   ctx.moveTo(startX, startY);
   ctx.bezierCurveTo(cx1, cy1, cx2, cy2, startX, startY);
@@ -114,7 +115,7 @@ function drawDirectedEdge(
 
   ctx.beginPath();
   ctx.moveTo(startX, startY);
-  ctx.strokeStyle = edge.status;
+  ctx.strokeStyle = STATUS_TO_COLOR[edge.status];
   ctx.lineTo(endX, endY);
   ctx.lineWidth = 3;
   ctx.stroke();
@@ -153,7 +154,7 @@ function drawUndirectedEdge(
   ctx.moveTo(fromX, fromY);
   ctx.lineTo(toX, toY);
   ctx.lineWidth = 3;
-  ctx.strokeStyle = edge.status;
+  ctx.strokeStyle = STATUS_TO_COLOR[edge.status];
   ctx.stroke();
   ctx.strokeStyle = "black";
 

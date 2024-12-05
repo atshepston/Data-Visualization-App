@@ -30,8 +30,9 @@
   const edgeTypeToggle = ref("Directed");
 
   //Edge weight for the edge currently selected
-  const selectedEdgeWeight = ref("");
   const edgeType = ref<"directed" | "undirected">("undirected");
+  const selectedEdge = ref<GEdge>();
+  const newWeight = ref("");
 
   onMounted(() => {
     if (!canvas.value) {
@@ -106,7 +107,6 @@
     draggingNode.value = nodes.value[nodeIndex];
   }
 
-  // Need to optimize this better
   function handleDrag(event: MouseEvent) {
     if (!draggingNode.value) return;
     draggingNode.value.x = event.offsetX;
@@ -115,10 +115,17 @@
 
   function handleClick(event: MouseEvent) {
     const { offsetX: x, offsetY: y } = event;
+    if (selectedEdge.value) {
+      selectedEdge.value.status = "default";
+    }
 
     // if nothing is intersecting, add a new node
-    const index = getNodeIndexByCoordinates(x, y);
-    if (index !== -1) return;
+    const nodeIndex = getNodeIndexByCoordinates(x, y);
+    const edgeIndex = getEdgeIndexByCoordinates(x, y);
+    if (edgeIndex != -1) {
+      return;
+    }
+    if (nodeIndex != -1) return;
     const newNode: GNode = {
       id: newNodeId,
       x,
@@ -127,11 +134,21 @@
     };
     newNodeId += 1;
     nodes.value.push(newNode);
+    redraw();
   }
 
   function handleDoubleClick(event: MouseEvent) {
     const { offsetX: x, offsetY: y } = event;
     const index = getNodeIndexByCoordinates(x, y);
+    const edgeIndex = getEdgeIndexByCoordinates(x, y);
+    if (selectedEdge.value) {
+      selectedEdge.value.status = "default";
+    }
+    if (edgeIndex != -1) {
+      selectedEdge.value = edges.value[edgeIndex];
+      selectedEdge.value.status = "selected";
+      return;
+    }
     if (index === -1) return;
     const node = nodes.value[index];
     selectedNodeIds.value.push(node.id);
@@ -155,9 +172,8 @@
       to: toNodeId,
       type: edgeType.value,
       weight: 1,
-      status: "selected",
+      status: "default",
     });
-
     newEdgeId += 1;
   }
 
@@ -172,6 +188,70 @@
     return -1;
   }
 
+  // TODO: Change hitbox so it doesn't overlap node
+  function getEdgeIndexByCoordinates(x: number, y: number) {
+    for (let i = 0; i < edges.value.length; i++) {
+      let edge = edges.value[i];
+      let fromX = -1;
+      let fromY = -1;
+      let toX = -1;
+      let toY = -1;
+      for (let x = 0; x < nodes.value.length; x++) {
+        let cur = nodes.value[x];
+        if (cur.id == edge.to) {
+          toX = cur.x;
+          toY = cur.y;
+        } else if (cur.id == edge.from) {
+          fromX = cur.x;
+          fromY = cur.y;
+        }
+      }
+      if (toX == -1 || toY == -1 || fromX == -1 || fromY == -1) {
+        alert("One of these nodes does not exist");
+        return -1;
+      }
+      const rad = Math.atan2(fromY - toY, fromX - toX);
+
+      const startX = 30 * Math.cos(rad) + fromX;
+      const startY = 30 * Math.sin(rad) + fromY;
+      const endX = 30 * Math.cos(rad) + toX;
+      const endY = 30 * Math.sin(rad) + toY;
+      const distFromEdge = 15;
+      const x1 = distFromEdge * Math.cos(rad + Math.PI / 2) + startX;
+      const y1 = distFromEdge * Math.sin(rad + Math.PI / 2) + startY;
+      const x2 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + startX;
+      const y2 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + startY;
+      const x3 = distFromEdge * Math.cos(rad + Math.PI / 2) + endX;
+      const y3 = distFromEdge * Math.sin(rad + Math.PI / 2) + endY;
+      const x4 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + endX;
+      const y4 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + endY;
+      const rectArea =
+        calcArea(x1, y1, x2, y2, x3, y3) + calcArea(x1, y1, x4, y4, x3, y3);
+      const APD = calcArea(x1, y1, x, y, x4, y4);
+      const DPC = calcArea(x4, y4, x, y, x3, y3);
+      const CBP = calcArea(x3, y3, x2, y2, x, y);
+      const PBA = calcArea(x, y, x2, y2, x1, y1);
+      const sum = APD + DPC + CBP + PBA;
+      if (sum > rectArea) {
+        continue;
+      } else {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  function calcArea(
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+    x3: number,
+    y3: number
+  ) {
+    return 0.5 * Math.abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+  }
+
   function redraw() {
     if (!canvas.value) return;
     const ctx = canvas.value.getContext("2d");
@@ -183,6 +263,7 @@
       nodeRadius,
     });
   }
+
   function toggleEdgeType() {
     if (edgeType.value == "directed") {
       edgeType.value = "undirected";
@@ -229,46 +310,23 @@
   }
 
   function removeEdge() {
-    const [node1Id, node2Id] = [
-      Number(connectionNodeId1.value),
-      Number(connectionNodeId2.value),
-    ];
-    const edgeExistsOnPath = edges.value.some(
-      (e) =>
-        (e.from === node1Id && e.to === node2Id) ||
-        (e.from === node2Id && e.to === node1Id)
-    );
-    if (!edgeExistsOnPath) return;
-
-    edges.value = edges.value.filter(
-      (e) =>
-        !(e.from === node1Id && e.to === node2Id) &&
-        !(e.from === node2Id && e.to === node1Id)
-    );
+    if (selectedEdge.value != null) {
+      const to = selectedEdge.value.to;
+      const from = selectedEdge.value.from;
+      edges.value = edges.value.filter(
+        (e) => !(e.from === from && e.to === to)
+      );
+    }
 
     connectionNodeId1.value = "";
     connectionNodeId2.value = "";
   }
 
   function editEdgeWeight() {
-    const [node1Id, node2Id] = [
-      Number(connectionNodeId1.value),
-      Number(connectionNodeId2.value),
-    ];
-    const edgeExistsOnPath = edges.value.some(
-      (e) =>
-        (e.from === node1Id && e.to === node2Id) ||
-        (e.from === node2Id && e.to === node1Id)
-    );
-    if (!edgeExistsOnPath) return;
-    edges.value.forEach((e) => {
-      if (
-        (e.from == node1Id && e.to == node2Id) ||
-        (e.from === node2Id && e.to === node1Id)
-      ) {
-        e.weight = Number(selectedEdgeWeight.value);
-      }
-    });
+    if (selectedEdge.value != null) {
+      selectedEdge.value.weight = Number(newWeight.value);
+    }
+
     redraw();
   }
 
@@ -327,6 +385,52 @@
         width="1000"
         height="500"
       ></canvas>
+    </div>
+    <div
+
+      style="display: flex; gap: 10px; margin: 15px 0; justify-content: center"
+    >
+      <input
+        style="width: 70px; border: solid 1px black; border-radius: 5px"
+        min="0"
+        v-model="connectionNodeId1"
+        type="number"
+        placeholder="Node 1"
+      />
+      <input
+        style="width: 70px; border: solid 1px black; border-radius: 5px"
+        min="0"
+        v-model="connectionNodeId2"
+        type="number"
+        placeholder="Node 2"
+      />
+      <button
+        id="createEdge"
+        @click="createNewEdge"
+      >
+        Create Edge
+      </button>
+      <button
+        id="removeEdge"
+        @click="removeEdge"
+      >
+        Remove Edge
+      </button>
+      <button
+        id="clearAll"
+        @click="clearAll"
+      >
+        Clear All
+      </button>
+      <input
+        style="width: 80px; border: solid 1px black; border-radius: 5px"
+        id="edgeWeight"
+        type="number"
+        v-model="newWeight"
+        @change="editEdgeWeight"
+        placeholder="Edge Weight"
+      />
+      <button @click="toggleEdgeType">Toggle directed/undirected</button>
     </div>
     <div
       style="
