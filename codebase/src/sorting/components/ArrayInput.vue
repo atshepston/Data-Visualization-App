@@ -48,7 +48,7 @@
             'left-index': index === currentLeftIndex,
             'right-index': index === currentRightIndex,
             'sorted-index':
-              selectedAlgorithm === 'selectionSort'
+              selectedAlgorithm.value === 'selectionSort'
                 ? currentSortedIndex !== null && index <= currentSortedIndex
                 : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
@@ -74,30 +74,28 @@
       </div>
     </div>
 
-    <div class="algorithm-dropdown-container">
-      <label for="algorithm-dropdown">Select Algorithm:</label>
-      <select
-        id="algorithm-dropdown"
-        v-model="selectedAlgorithm"
-      >
-        <option
-          v-for="algorithm in algorithms"
-          :key="algorithm.value"
-          :value="algorithm.value"
-        >
-          {{ algorithm.label }}
-        </option>
-      </select>
-      <p>You selected: {{ selectedAlgorithm }}</p>
-    </div>
+    <SelectMenu
+      v-model="selectedAlgorithm"
+      style="font-family: monospace; font-weight: bold;"
+      :items="algorithms"
+      label="Select Algorithm"
+    />
+
+    <SelectMenu
+      v-model="selectedSpeed"
+      :items="speeds"
+      label="Playback Speed"
+    />
+
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, defineEmits, watch } from "vue";
+  import { ref, watch, computed } from "vue";
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
+  import SelectMenu from "./SelectMenu.vue";
 
   const emit = defineEmits<{
     (event: "sortedArray", value: number[]): void;
@@ -107,13 +105,21 @@
   const array = ref<number[]>([]);
   const error = ref("");
 
-  const selectedAlgorithm = ref("");
-
-  const algorithms = ref([
+  const algorithms = [
     { value: "bubbleSort", label: "Bubble Sort" },
     { value: "insertionSort", label: "Insertion Sort" },
     { value: "selectionSort", label: "Selection Sort" },
-  ]);
+  ];
+
+  const selectedAlgorithm = ref(algorithms[0]);
+
+  const speeds = [
+    { delay: 750, label: "x0.5" },
+    { delay: 500, label: "x1" },
+    { delay: 250, label: "x1.5" },
+  ];
+
+  const selectedSpeed = ref(speeds[1]);
 
   let currentLeftIndex = ref<number | null>(null);
   let currentRightIndex = ref<number | null>(null);
@@ -123,7 +129,7 @@
   const pseudoCode = ref([""]);
 
   // Watch for changes to selectedAlgorithm dropdown
-  watch(selectedAlgorithm, (newVal) => {
+  watch(selectedAlgorithm, ({ value: newVal }) => {
     if (newVal === "bubbleSort") {
       pseudoCode.value = `do
   swapped = false
@@ -204,22 +210,25 @@ while swapped`.split("\n");
   };
 
   const sortArray = async () => {
-    if (selectedAlgorithm.value === "bubbleSort") {
-      await bubbleSort({
-        array: array.value,
-        ms: 500,
-        ui: {
-          updateSwap: updateSwap,
-          updateLeftIndex: updateLeftIndex,
-          updateRightIndex: updateRightIndex,
-          setHighlightedLines: setHighlightedLines,
-          updateSortedIndex: updateSortedIndex,
-        },
-      });
-    } else if (selectedAlgorithm.value === "insertionSort") {
+    const delayInMs = selectedSpeed.value.delay;
+    const algorithm = selectedAlgorithm.value.value;
+    const sortOptions = {
+      array: array.value,
+      ms: delayInMs,
+      ui: {
+        updateSwap: updateSwap,
+        updateLeftIndex: updateLeftIndex,
+        updateRightIndex: updateRightIndex,
+        setHighlightedLines: setHighlightedLines,
+        updateSortedIndex: updateSortedIndex,
+      },
+    };
+    if (algorithm === "bubbleSort") {
+      await bubbleSort(sortOptions);
+    } else if (algorithm === "insertionSort") {
       await insertionSort({
         array: array.value,
-        ms: 500,
+        ms: delayInMs,
         ui: {
           updateSwap: updateSwap,
           updateLeftIndex: updateLeftIndex,
@@ -227,18 +236,8 @@ while swapped`.split("\n");
           setHighlightedLines: setHighlightedLines,
         },
       });
-    } else if (selectedAlgorithm.value === "selectionSort") {
-      await selectionSort({
-        array: array.value,
-        ms: 500,
-        ui: {
-          updateSwap: updateSwap,
-          updateLeftIndex: updateLeftIndex,
-          updateRightIndex: updateRightIndex,
-          setHighlightedLines: setHighlightedLines,
-          updateSortedIndex: updateSortedIndex,
-        },
-      });
+    } else if (algorithm === "selectionSort") {
+      await selectionSort(sortOptions);
     }
     emit("sortedArray", array.value);
     resetValue();
@@ -374,5 +373,19 @@ while swapped`.split("\n");
 
   .sorted-index {
     background-color: orange !important;
+  }
+
+  .algorithm-dropdown-container {
+    margin-top: 50px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-family: monospace;
+    font-weight: bold;
+  }
+
+  select {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    margin-left: 5px;
   }
 </style>
