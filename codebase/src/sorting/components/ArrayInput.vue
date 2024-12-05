@@ -48,7 +48,7 @@
             'left-index': index === currentLeftIndex,
             'right-index': index === currentRightIndex,
             'sorted-index':
-              selectedAlgorithm === 'selectionSort'
+              selectedAlgorithm.value === 'selectionSort'
                 ? currentSortedIndex !== null && index <= currentSortedIndex
                 : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
@@ -74,25 +74,19 @@
       </div>
     </div>
 
-    <div class="algorithm-dropdown-container">
-      <label for="algorithm-dropdown">Select Algorithm:</label>
-      <select
-        id="algorithm-dropdown"
-        v-model="selectedAlgorithm"
-      >
-        <option
-          v-for="algorithm in algorithms"
-          :key="algorithm.value"
-          :value="algorithm.value"
-        >
-          {{ algorithm.label }}
-        </option>
-      </select>
-    </div>
-    <PlaybackSpeed
-      :speeds="speeds"
-      v-model="selectedSpeed"
+    <SelectMenu
+      v-model="selectedAlgorithm"
+      style="font-family: monospace; font-weight: bold;"
+      :items="algorithms"
+      label="Select Algorithm"
     />
+
+    <SelectMenu
+      v-model="selectedSpeed"
+      :items="speeds"
+      label="Playback Speed"
+    />
+
   </div>
 </template>
 
@@ -101,7 +95,7 @@
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
-  import PlaybackSpeed from "./PlaybackSpeed.vue";
+  import SelectMenu from "./SelectMenu.vue";
 
   const emit = defineEmits<{
     (event: "sortedArray", value: number[]): void;
@@ -111,18 +105,20 @@
   const array = ref<number[]>([]);
   const error = ref("");
 
-  const selectedAlgorithm = ref("");
-
-  const algorithms = ref([
+  const algorithms = [
     { value: "bubbleSort", label: "Bubble Sort" },
     { value: "insertionSort", label: "Insertion Sort" },
     { value: "selectionSort", label: "Selection Sort" },
-  ]);
+  ];
+
+  const selectedAlgorithm = ref(algorithms[0]);
+
   const speeds = [
     { delay: 750, label: "x0.5" },
     { delay: 500, label: "x1" },
     { delay: 250, label: "x1.5" },
   ];
+
   const selectedSpeed = ref(speeds[1]);
 
   let currentLeftIndex = ref<number | null>(null);
@@ -133,7 +129,7 @@
   const pseudoCode = ref([""]);
 
   // Watch for changes to selectedAlgorithm dropdown
-  watch(selectedAlgorithm, (newVal) => {
+  watch(selectedAlgorithm, ({ value: newVal }) => {
     if (newVal === "bubbleSort") {
       pseudoCode.value = `do
   swapped = false
@@ -215,6 +211,7 @@ while swapped`.split("\n");
 
   const sortArray = async () => {
     const delayInMs = selectedSpeed.value.delay;
+    const algorithm = selectedAlgorithm.value.value;
     const sortOptions = {
       array: array.value,
       ms: delayInMs,
@@ -226,9 +223,9 @@ while swapped`.split("\n");
         updateSortedIndex: updateSortedIndex,
       },
     };
-    if (selectedAlgorithm.value === "bubbleSort") {
+    if (algorithm === "bubbleSort") {
       await bubbleSort(sortOptions);
-    } else if (selectedAlgorithm.value === "insertionSort") {
+    } else if (algorithm === "insertionSort") {
       await insertionSort({
         array: array.value,
         ms: delayInMs,
@@ -239,7 +236,7 @@ while swapped`.split("\n");
           setHighlightedLines: setHighlightedLines,
         },
       });
-    } else if (selectedAlgorithm.value === "selectionSort") {
+    } else if (algorithm === "selectionSort") {
       await selectionSort(sortOptions);
     }
     emit("sortedArray", array.value);
