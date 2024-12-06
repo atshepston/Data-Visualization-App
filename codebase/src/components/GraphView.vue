@@ -315,6 +315,7 @@
 
     connectionNodeId1.value = "";
     connectionNodeId2.value = "";
+    document.getElementById("nodeInput1")?.focus();
   }
 
   function removeEdge() {
@@ -365,6 +366,8 @@
       selectedEdge.value = undefined;
       connectionNodeId1.value = "";
       connectionNodeId2.value = "";
+      newWeight.value = "";
+      executionSpeed.value = "";
       redraw();
     }
   }
@@ -597,29 +600,33 @@
     >
       <ul
         style="
-          font-size: 20px;
+          font-size: 18px;
           background-color: #04aa6d;
           box-sizing: border-box;
           margin: 0px;
           border-radius: 8px;
           color: white;
-          padding: 5px 20px;
+          padding: 5px 25px;
         "
       >
         <li>Click within the borders to create a node</li>
-        <li>Double click on a node to select it</li>
+        <li>Double click on a node or edge to select it</li>
         <li>Click and hold down on a node to drag it around</li>
         <li>
-          To add or remove an edge between two nodes, enter the node values and
-          press the corresponding button or press enter
+          To add an edge between two nodes, enter the node values and press
+          "Create Edge" or press enter
         </li>
         <li>
-          To edit an edge weight, click on the edge and enter a new value in the
-          input box
+          To delete an edge, either select the edge or enter the neighboring
+          nodes IDs and press "Remove Edge"
         </li>
         <li>
-          When toggling between directed and undirected edges, the graph will
-          clear
+          To edit an edge weight, select the edge or enter the neighboring nodes
+          IDs, then enter a new value in "Edge Weight" and press enter
+        </li>
+        <li>
+          Select "directed" or "undirected" to switch between the corresponding
+          edge types
         </li>
         <li>To delete the graph, select "Clear All"</li>
         <li>
