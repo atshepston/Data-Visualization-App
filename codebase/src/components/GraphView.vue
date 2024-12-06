@@ -188,6 +188,7 @@
     return -1;
   }
 
+  // TODO: Add hitbox detection for bi-direction edges in directed graph
   function getEdgeIndexByCoordinates(x: number, y: number) {
     for (let i = 0; i < edges.value.length; i++) {
       let edge = edges.value[i];
@@ -206,7 +207,6 @@
         }
       }
       if (toX == -1 || toY == -1 || fromX == -1 || fromY == -1) {
-        alert("One of these nodes does not exist");
         return -1;
       }
       const rad = Math.atan2(fromY - toY, fromX - toX);
@@ -297,12 +297,19 @@
     const node2InGraph = nodes.value.some((n) => n.id === node2Id);
     if (!node1InGraph || !node2InGraph) return;
 
-    const edgeExistsOnPath = edges.value.some(
-      (e) =>
-        (e.from === node1Id && e.to === node2Id) ||
-        (e.from === node2Id && e.to === node1Id)
-    );
-    if (edgeExistsOnPath) return;
+    if (edgeTypeToggle.value == "undirected") {
+      const edgeExistsOnPath = edges.value.some(
+        (e) =>
+          (e.from === node1Id && e.to === node2Id) ||
+          (e.from === node2Id && e.to === node1Id)
+      );
+      if (edgeExistsOnPath) return;
+    } else {
+      const edgeExistsOnPath = edges.value.some(
+        (e) => e.from === node1Id && e.to === node2Id
+      );
+      if (edgeExistsOnPath) return;
+    }
 
     addEdge(node1Id, node2Id);
 
