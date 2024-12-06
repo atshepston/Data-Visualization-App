@@ -3,18 +3,22 @@ import type { GEdge, GNode } from "../graph/types";
 import { STATUS_TO_COLOR } from "../graph/types";
 const CIRCLER = 30;
 
+type nodePair = {
+  to: number;
+  from: number;
+};
+
 export function drawEdges(
   ctx: CanvasRenderingContext2D,
   nodes: GNode[],
   edges: GEdge[]
 ) {
-  // Make this not hard coded
-  // Maybe optimize this using adjacency list later
-  // TODO: Add bi-directional edges
-  // TODO: Add dragging for self edges?
+  let prevPairs: nodePair[] = [];
+
   for (let i = 0; i < edges.length; i++) {
     let to: number = edges[i].to;
     let from: number = edges[i].from;
+    prevPairs.push({ to: to, from: from });
 
     //Self Edge
     if (to == from) {
@@ -25,9 +29,7 @@ export function drawEdges(
           nodeCords = [cur.x, cur.y];
         }
       }
-      //Maybe make angle opposite to the average of all other angles for that node
-      drawSelfEdge(ctx, Math.PI, nodeCords[0], nodeCords[1], CIRCLER, edges[i]);
-      //drawSelfEdge(ctx, (Math.PI / 2), nodeCords[0], nodeCords[1], CIRCLER, edges[i]);
+      drawSelfEdge(ctx, Math.PI, nodeCords[0], nodeCords[1], edges[i], CIRCLER);
       continue;
     }
 
@@ -52,7 +54,20 @@ export function drawEdges(
     if (edges[i].type == "undirected") {
       drawUndirectedEdge(ctx, fromX, fromY, toX, toY, edges[i], CIRCLER);
     } else if ((edges[i].type = "directed")) {
-      drawDirectedEdge(ctx, fromX, fromY, toX, toY, edges[i], CIRCLER);
+      let secondEdge = false;
+      for (let p = 0; p < prevPairs.length; p++) {
+        if (
+          prevPairs[p].from == edges[i].to &&
+          prevPairs[p].to == edges[i].from
+        ) {
+          secondEdge = true;
+        }
+      }
+      if (secondEdge) {
+        drawSecondDirectedEdge(ctx, fromX, fromY, toX, toY, edges[i], CIRCLER);
+      } else {
+        drawDirectedEdge(ctx, fromX, fromY, toX, toY, edges[i], CIRCLER);
+      }
     }
   }
 }
@@ -63,12 +78,12 @@ function drawSelfEdge(
   rad: number,
   x: number,
   y: number,
-  r: number,
-  edge: GEdge
+  edge: GEdge,
+  circleR: number
 ) {
   rad = -rad;
-  const startX = (r - 10) * Math.cos(rad) + x;
-  const startY = (r - 10) * Math.sin(rad) + y;
+  const startX = (circleR - 10) * Math.cos(rad) + x;
+  const startY = (circleR - 10) * Math.sin(rad) + y;
 
   const SF = 70;
 
@@ -105,8 +120,8 @@ function drawDirectedEdge(
   circleR: number
 ) {
   const rad = Math.atan2(fromY - toY, fromX - toX);
-  const startX = circleR * Math.cos(rad) + fromX;
-  const startY = circleR * Math.sin(rad) + fromY;
+  const startX = -circleR * Math.cos(rad) + fromX;
+  const startY = -circleR * Math.sin(rad) + fromY;
   const endX = circleR * Math.cos(rad) + toX;
   const endY = circleR * Math.sin(rad) + toY;
 
@@ -137,6 +152,61 @@ function drawDirectedEdge(
   ctx.fill();
 
   addEdgeWeight(ctx, (fromX + toX) / 2, (fromY + toY) / 2, edge.weight);
+}
+
+function drawSecondDirectedEdge(
+  ctx: CanvasRenderingContext2D,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  edge: GEdge,
+  circleR: number
+) {
+  const rad = Math.atan2(fromY - toY, fromX - toX);
+  const startX = -circleR * Math.cos(rad) + fromX;
+  const startY = -circleR * Math.sin(rad) + fromY;
+  const endX = circleR * Math.cos(rad) + toX;
+  const endY = circleR * Math.sin(rad) + toY;
+
+  const midPoint = [
+    (startX + endX) / 2 + 50 * Math.cos(rad + Math.PI / 2),
+    (startY + endY) / 2 + 50 * Math.sin(rad + Math.PI / 2),
+  ];
+
+  //Control point for the second curve
+  const cx1 = midPoint[0] + 50 * Math.cos(rad + Math.PI / 2);
+  const cy1 = midPoint[1] + 50 * Math.sin(rad + Math.PI / 2);
+
+  ctx.beginPath();
+  ctx.strokeStyle = STATUS_TO_COLOR[edge.status];
+  ctx.lineWidth = 3;
+  ctx.moveTo(startX, startY);
+  ctx.quadraticCurveTo(cx1, cy1, endX, endY);
+  ctx.stroke();
+  ctx.strokeStyle = "black";
+
+  const triRad = Math.atan2(cy1 - endY, cx1 - endX);
+
+  const triEndX = 15 * Math.cos(triRad) + endX;
+  const triEndY = 15 * Math.sin(triRad) + endY;
+
+  const triTipX = endX;
+  const triTipY = endY;
+  const triLX = 10 * Math.cos(triRad + Math.PI / 2) + triEndX;
+  const triLY = 10 * Math.sin(triRad + Math.PI / 2) + triEndY;
+  const triRX = 10 * Math.cos(triRad - Math.PI / 2) + triEndX;
+  const triRY = 10 * Math.sin(triRad - Math.PI / 2) + triEndY;
+
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(triLX, triLY);
+  ctx.lineTo(triRX, triRY);
+  ctx.lineTo(triTipX, triTipY);
+  ctx.fillStyle = "black";
+  ctx.fill();
+
+  addEdgeWeight(ctx, midPoint[0], midPoint[1], edge.weight);
 }
 
 function drawUndirectedEdge(
