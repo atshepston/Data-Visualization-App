@@ -188,7 +188,6 @@
     return -1;
   }
 
-  // TODO: Change hitbox so it doesn't overlap node
   function getEdgeIndexByCoordinates(x: number, y: number) {
     for (let i = 0; i < edges.value.length; i++) {
       let edge = edges.value[i];
@@ -212,11 +211,12 @@
       }
       const rad = Math.atan2(fromY - toY, fromX - toX);
 
-      const startX = 30 * Math.cos(rad) + fromX;
-      const startY = 30 * Math.sin(rad) + fromY;
-      const endX = 30 * Math.cos(rad) + toX;
-      const endY = 30 * Math.sin(rad) + toY;
+      const startX = -35 * Math.cos(rad) + fromX;
+      const startY = -35 * Math.sin(rad) + fromY;
+      const endX = 35 * Math.cos(rad) + toX;
+      const endY = 35 * Math.sin(rad) + toY;
       const distFromEdge = 15;
+
       const x1 = distFromEdge * Math.cos(rad + Math.PI / 2) + startX;
       const y1 = distFromEdge * Math.sin(rad + Math.PI / 2) + startY;
       const x2 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + startX;
@@ -225,6 +225,7 @@
       const y3 = distFromEdge * Math.sin(rad + Math.PI / 2) + endY;
       const x4 = distFromEdge * Math.cos(rad + (3 * Math.PI) / 2) + endX;
       const y4 = distFromEdge * Math.sin(rad + (3 * Math.PI) / 2) + endY;
+
       const rectArea =
         calcArea(x1, y1, x2, y2, x3, y3) + calcArea(x1, y1, x4, y4, x3, y3);
       const APD = calcArea(x1, y1, x, y, x4, y4);
