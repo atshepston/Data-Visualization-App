@@ -1,4 +1,5 @@
 import type { AdjacencyList } from "./graph/types";
+import type { GNode, GEdge } from "./graph/types";
 
 /**
  *
@@ -61,4 +62,79 @@ export function dfsWithTrace(graph: AdjacencyList, source: number) {
 
   dfs(startNode); // Start DFS from the source node
   return { trace, visited };
+}
+
+//TODO: Dijkstra's
+export function dijkstraWithTrace(
+  nodes: GNode[],
+  edges: GEdge[],
+  startNodeId: GNode["id"]
+) {
+  const distances: { [nodeId: GNode["id"]]: number } = {};
+  const visited: GNode["id"][] = [];
+  const priorityQueue: [GNode["id"], number][] = [];
+  let trace: [GNode["id"] | null, GNode["id"], number, number][] = [];
+
+  // Initialize distances to Infinity, except the start node
+  nodes.forEach((node) => {
+    distances[node.id] = node.id === startNodeId ? 0 : Infinity;
+  });
+  trace.push([null, startNodeId, 0, 0]);
+
+  // Add the start node to the priority queue
+  priorityQueue.push([startNodeId, 0]);
+
+  // Helper function to extract the node with the smallest distance
+  const shortestDistance = (): [GNode["id"], number] | undefined => {
+    let minIndex = 0;
+    for (let i = 1; i < priorityQueue.length; i++) {
+      if (priorityQueue[i][1] < priorityQueue[minIndex][1]) {
+        minIndex = i;
+      }
+    }
+    return priorityQueue.splice(minIndex, 1)[0];
+  };
+
+  // Main loop
+  while (priorityQueue.length > 0) {
+    const [currentNode, currentDistance] = shortestDistance()!;
+
+    if (visited.includes(currentNode)) continue;
+    visited.push(currentNode);
+    // Update distances for all neighbors
+    const neighbors = edges.filter(
+      (edge) =>
+        edge.from === currentNode ||
+        (edge.type === "undirected" && edge.to === currentNode)
+    );
+    for (const edge of neighbors) {
+      const neighbor =
+        edge.type === "directed"
+          ? edge.to
+          : edge.to === currentNode
+          ? edge.from
+          : edge.to;
+      if (!visited.includes(neighbor)) {
+        const newDistance = currentDistance + edge.weight;
+        if (newDistance < distances[neighbor]) {
+          const oldDistance = distances[neighbor];
+          distances[neighbor] = newDistance;
+          priorityQueue.push([neighbor, newDistance]);
+          const [originNode, destinationNode] =
+            edge.from === currentNode
+              ? [edge.from, edge.to]
+              : [edge.to, edge.from];
+          trace.push([originNode, destinationNode, oldDistance, newDistance]);
+        } else {
+          // trace.push([
+          //   currentNode,
+          //   edge.to,
+          //   distances[neighbor],
+          //   distances[neighbor],
+          // ]);
+        }
+      }
+    }
+  }
+  return { trace, distances };
 }
