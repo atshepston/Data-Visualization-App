@@ -31,18 +31,19 @@
           Random
         </button>
 
-        <select
-          id="algorithm-dropdown"
+        <SelectMenu
           v-model="selectedAlgorithm"
-        >
-          <option
-            v-for="algorithm in algorithms"
-            :key="algorithm.value"
-            :value="algorithm.value"
-          >
-            {{ algorithm.label }}
-          </option>
-        </select>
+          style="font-family: monospace; font-weight: bold"
+          :items="algorithms"
+          label="Select Algorithm"
+        />
+
+        <SelectMenu
+          v-model="selectedSpeed"
+          :items="speeds"
+          label="Playback Speed"
+        />
+
       </form>
       <p
         v-if="error"
@@ -61,7 +62,7 @@
             'left-index': index === currentLeftIndex,
             'right-index': index === currentRightIndex,
             'sorted-index':
-              selectedAlgorithm === 'selectionSort'
+              selectedAlgorithm.value === 'selectionSort'
                 ? currentSortedIndex !== null && index <= currentSortedIndex
                 : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
@@ -94,6 +95,7 @@
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
+  import SelectMenu from "./SelectMenu.vue";
 
   const emit = defineEmits<{
     (event: "sortedArray", value: number[]): void;
@@ -103,13 +105,23 @@
   const array = ref<number[]>([]);
   const error = ref("");
 
-  const selectedAlgorithm = ref("bubbleSort");
-
-  const algorithms = ref([
+  const algorithms = [
+    { value: "", label: "Select an Algorithm" }, // Placeholder
     { value: "bubbleSort", label: "Bubble Sort" },
     { value: "insertionSort", label: "Insertion Sort" },
     { value: "selectionSort", label: "Selection Sort" },
-  ]);
+  ];
+
+  const selectedAlgorithm = ref(algorithms[0]);
+
+  const speeds = [
+    { delay: 0, label: "Select Speed" }, // Placeholder
+    { delay: 750, label: "x0.5" },
+    { delay: 500, label: "x1" },
+    { delay: 250, label: "x1.5" },
+  ];
+
+  const selectedSpeed = ref(speeds[0]);
 
   let currentLeftIndex = ref<number | null>(null);
   let currentRightIndex = ref<number | null>(null);
@@ -117,9 +129,9 @@
   const currentSortedIndex = ref<number | null>(null);
   const pseudoCode = ref([""]);
 
-  // Initialize pseudoCode based on the initial selectedAlgorithm value
-  const initializePseudoCode = () => {
-    if (selectedAlgorithm.value === "bubbleSort") {
+  // Watch for changes to selectedAlgorithm dropdown
+  watch(selectedAlgorithm, ({ value: newVal }) => {
+    if (newVal === "bubbleSort") {
       pseudoCode.value = `do
   swapped = false
   for index = 1 to index_of_last_unsorted_element - 1
@@ -206,20 +218,38 @@ while swapped`.split("\n");
     resetValue();
   };
 
+  watch([selectedAlgorithm, selectedSpeed], ([newAlgorithm, newSpeed]) => {
+    if (newAlgorithm.value !== "" && newSpeed.delay !== 0) {
+      error.value = ""; // Clear the error if valid selections are made
+    }
+  });
+
   const sortArray = async () => {
-    if (selectedAlgorithm.value === "bubbleSort") {
-      await bubbleSort({
-        array: array.value,
-        ms: 500,
-        ui: {
-          updateSwap: updateSwap,
-          updateLeftIndex: updateLeftIndex,
-          updateRightIndex: updateRightIndex,
-          setHighlightedLines: setHighlightedLines,
-          updateSortedIndex: updateSortedIndex,
-        },
-      });
-    } else if (selectedAlgorithm.value === "insertionSort") {
+    if (
+      selectedAlgorithm.value.value === "" ||
+      selectedSpeed.value.delay === 0
+    ) {
+      error.value = "Please select an algorithm and speed before sorting.";
+      return;
+    }
+    const delayInMs = selectedSpeed.value.delay;
+    console.log("delayInMs: " + selectedSpeed.value.delay);
+    const algorithm = selectedAlgorithm.value.value;
+    console.log("algorithm: " + selectedAlgorithm.value.value);
+    const sortOptions = {
+      array: array.value,
+      ms: delayInMs,
+      ui: {
+        updateSwap: updateSwap,
+        updateLeftIndex: updateLeftIndex,
+        updateRightIndex: updateRightIndex,
+        setHighlightedLines: setHighlightedLines,
+        updateSortedIndex: updateSortedIndex,
+      },
+    };
+    if (algorithm === "bubbleSort") {
+      await bubbleSort(sortOptions);
+    } else if (algorithm === "insertionSort") {
       await insertionSort({
         array: array.value,
         ms: 500,
@@ -230,18 +260,8 @@ while swapped`.split("\n");
           setHighlightedLines: setHighlightedLines,
         },
       });
-    } else if (selectedAlgorithm.value === "selectionSort") {
-      await selectionSort({
-        array: array.value,
-        ms: 500,
-        ui: {
-          updateSwap: updateSwap,
-          updateLeftIndex: updateLeftIndex,
-          updateRightIndex: updateRightIndex,
-          setHighlightedLines: setHighlightedLines,
-          updateSortedIndex: updateSortedIndex,
-        },
-      });
+    } else if (algorithm === "selectionSort") {
+      await selectionSort(sortOptions);
     }
     emit("sortedArray", array.value);
     resetValue();
