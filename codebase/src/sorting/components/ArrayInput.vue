@@ -134,22 +134,25 @@
     ({ value: newVal }) => {
       if (newVal === "bubbleSort") {
         pseudoCode.value = `do
-swapped = false
-for index = 1 to index_of_last_unsorted_element - 1
-  if left_element > right_element
-    swap(left_element, right_element)
-    swapped = true;
-while swapped`.split("\n");
-      } else if (newVal === "insertionSort") {
-        pseudoCode.value = `for index = 1 to array.length - 1
-  while left_element >= 0
+  swapped = false
+  for index = 1 to index_of_last_unsorted_element - 1
     if left_element > right_element
       swap(left_element, right_element)
-      swapped = true`.split("\n");
+      swapped = true;
+while swapped`.split("\n");
+      } else if (newVal === "insertionSort") {
+        pseudoCode.value = `do
+  swapped = false
+  for index = 1 to index_of_last_unsorted_element - 1
+    while left_element >= 0
+      if left_element > right_element
+        swap(left_element, right_element)
+        swapped = true;
+while swapped`.split("\n");
       } else if (newVal === "selectionSort") {
         pseudoCode.value = `for index = 0 to index_of_last_unsorted_element - 1
-  find smallest unsorted element
-  swap(left_element, right_element)`.split("\n");
+    find smallest unsorted element
+    swap(left_element, right_element)`.split("\n");
       } else {
         pseudoCode.value = [""]; // Reset if no algorithm is selected
       }
