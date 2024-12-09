@@ -43,7 +43,6 @@
           :items="speeds"
           label="Playback Speed"
         />
-
       </form>
       <p
         v-if="error"
@@ -139,7 +138,7 @@
       swap(left_element, right_element)
       swapped = true;
 while swapped`.split("\n");
-    } else if (selectedAlgorithm.value === "insertionSort") {
+    } else if (selectedAlgorithm.value.label === "insertionSort") {
       pseudoCode.value = `do
   swapped = false
   for index = 1 to index_of_last_unsorted_element - 1
@@ -148,21 +147,13 @@ while swapped`.split("\n");
         swap(left_element, right_element)
         swapped = true;
 while swapped`.split("\n");
-    } else if (selectedAlgorithm.value === "selectionSort") {
+    } else if (selectedAlgorithm.value.label === "selectionSort") {
       pseudoCode.value = `for index = 0 to index_of_last_unsorted_element - 1
     find smallest unsorted element
     swap(left_element, right_element)`.split("\n");
     } else {
       pseudoCode.value = [""]; // Reset if no algorithm is selected
     }
-  };
-
-  // Call initializePseudoCode to set the initial pseudoCode
-  initializePseudoCode();
-
-  // Watch for changes to selectedAlgorithm dropdown
-  watch(selectedAlgorithm, (newVal) => {
-    initializePseudoCode();
   });
 
   const updateLeftIndex = (index: number | null) => {
