@@ -30,6 +30,19 @@
         >
           Random
         </button>
+
+        <SelectMenu
+          v-model="selectedAlgorithm"
+          style="font-family: monospace; font-weight: bold"
+          :items="algorithms"
+          label="Select Algorithm"
+        />
+
+        <SelectMenu
+          v-model="selectedSpeed"
+          :items="speeds"
+          label="Playback Speed"
+        />
       </form>
       <p
         v-if="error"
@@ -53,11 +66,11 @@
                 : currentSortedIndex !== null && index >= currentSortedIndex,
           }"
           :style="{
-            height: `${number * (number / Math.max(...array)) * 7}px`,
-            width: `${array.length < 20 ? 20 : 5}px`,
+            height: `${(number + 3) * 5}px`,
+            transform: `translateX(${index}px)`,
           }"
         >
-          <span v-if="array.length <= 15">{{ number }}</span>
+          <span>{{ number }}</span>
         </div>
       </div>
     </div>
@@ -73,25 +86,11 @@
         {{ line.trim() }}
       </div>
     </div>
-
-    <SelectMenu
-      v-model="selectedAlgorithm"
-      style="font-family: monospace; font-weight: bold;"
-      :items="algorithms"
-      label="Select Algorithm"
-    />
-
-    <SelectMenu
-      v-model="selectedSpeed"
-      :items="speeds"
-      label="Playback Speed"
-    />
-
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, computed } from "vue";
+  import { ref, defineEmits, watch } from "vue";
   import { bubbleSort } from "../algorithms/bubble";
   import { selectionSort } from "../algorithms/selection";
   import { insertionSort } from "../algorithms/insertion";
@@ -106,6 +105,7 @@
   const error = ref("");
 
   const algorithms = [
+    { value: "", label: "Select an Algorithm" }, // Placeholder
     { value: "bubbleSort", label: "Bubble Sort" },
     { value: "insertionSort", label: "Insertion Sort" },
     { value: "selectionSort", label: "Selection Sort" },
@@ -114,18 +114,18 @@
   const selectedAlgorithm = ref(algorithms[0]);
 
   const speeds = [
+    { delay: 0, label: "Select Speed" }, // Placeholder
     { delay: 750, label: "x0.5" },
     { delay: 500, label: "x1" },
     { delay: 250, label: "x1.5" },
   ];
 
-  const selectedSpeed = ref(speeds[1]);
+  const selectedSpeed = ref(speeds[0]);
 
   let currentLeftIndex = ref<number | null>(null);
   let currentRightIndex = ref<number | null>(null);
   const currentLines = ref<number[]>([]);
   const currentSortedIndex = ref<number | null>(null);
-
   const pseudoCode = ref([""]);
 
   // Watch for changes to selectedAlgorithm dropdown
@@ -209,9 +209,24 @@ while swapped`.split("\n");
     resetValue();
   };
 
+  watch([selectedAlgorithm, selectedSpeed], ([newAlgorithm, newSpeed]) => {
+    if (newAlgorithm.value !== "" && newSpeed.delay !== 0) {
+      error.value = ""; // Clear the error if valid selections are made
+    }
+  });
+
   const sortArray = async () => {
+    if (
+      selectedAlgorithm.value.value === "" ||
+      selectedSpeed.value.delay === 0
+    ) {
+      error.value = "Please select an algorithm and speed before sorting.";
+      return;
+    }
     const delayInMs = selectedSpeed.value.delay;
+    console.log("delayInMs: " + selectedSpeed.value.delay);
     const algorithm = selectedAlgorithm.value.value;
+    console.log("algorithm: " + selectedAlgorithm.value.value);
     const sortOptions = {
       array: array.value,
       ms: delayInMs,
@@ -228,7 +243,7 @@ while swapped`.split("\n");
     } else if (algorithm === "insertionSort") {
       await insertionSort({
         array: array.value,
-        ms: delayInMs,
+        ms: 500,
         ui: {
           updateSwap: updateSwap,
           updateLeftIndex: updateLeftIndex,
@@ -248,6 +263,7 @@ while swapped`.split("\n");
       Math.floor(Math.random() * 50)
     );
     array.value = randomArray;
+    inputValue.value = randomArray.join(",");
   };
 
   const updateSwap = (newArray: number[]) => {
@@ -280,7 +296,7 @@ while swapped`.split("\n");
 
   input[type="text"] {
     font-size: 14px;
-    width: auto;
+    width: 225px; /* Increased the width to make the input box longer */
   }
 
   .form-styles {
@@ -302,6 +318,13 @@ while swapped`.split("\n");
     font-family: monospace;
     cursor: pointer;
     transition: background-color 0.3s;
+    margin-left: 10px;
+  }
+
+  #algorithm-dropdown {
+    font-size: 14px;
+    font-family: monospace;
+    padding: auto;
     margin-left: 10px;
   }
 
@@ -331,11 +354,11 @@ while swapped`.split("\n");
     justify-content: center;
     align-items: flex-end;
     width: 1000px;
-    height: 400px;
+    height: 300px;
   }
 
   .array-bar {
-    margin: 5px;
+    width: 20px;
     padding: 10px;
     background-color: #007bff;
     border: 1px solid #ccc;
@@ -344,7 +367,8 @@ while swapped`.split("\n");
     align-items: center;
     justify-content: center;
     font-size: 20px;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: background-color 500ms, height 500ms, transform 500ms;
+    position: relative;
   }
 
   .pseudo-code-container {
@@ -373,19 +397,5 @@ while swapped`.split("\n");
 
   .sorted-index {
     background-color: orange !important;
-  }
-
-  .algorithm-dropdown-container {
-    margin-top: 50px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    font-family: monospace;
-    font-weight: bold;
-  }
-
-  select {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px;
-    margin-left: 5px;
   }
 </style>

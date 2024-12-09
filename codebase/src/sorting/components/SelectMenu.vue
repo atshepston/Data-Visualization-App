@@ -1,8 +1,5 @@
 <template>
-  <div style="display: flex; align-items: center; gap: 5px;">
-    <p>
-      {{ label }}
-    </p>
+  <div style="display: flex; align-items: center; gap: 5px">
     <div>
       <select v-model="selectedItem">
         <option
@@ -38,5 +35,6 @@
 <style scoped>
   select {
     font-family: Arial, Helvetica, sans-serif;
+    margin-left: 15px;
   }
 </style>
