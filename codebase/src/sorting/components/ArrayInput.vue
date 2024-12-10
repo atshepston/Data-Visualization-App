@@ -128,18 +128,20 @@
   const currentSortedIndex = ref<number | null>(null);
   const pseudoCode = ref([""]);
 
-  // Watch for changes to selectedAlgorithm dropdown
-  watch(selectedAlgorithm, ({ value: newVal }) => {
-    if (newVal === "bubbleSort") {
-      pseudoCode.value = `do
+  // Initialized pseudocode and watches for changes to selectedAlgorithm, updating pseudocode
+  watch(
+    selectedAlgorithm,
+    ({ value: newVal }) => {
+      if (newVal === "bubbleSort") {
+        pseudoCode.value = `do
   swapped = false
   for index = 1 to index_of_last_unsorted_element - 1
     if left_element > right_element
       swap(left_element, right_element)
       swapped = true;
 while swapped`.split("\n");
-    } else if (selectedAlgorithm.value.label === "insertionSort") {
-      pseudoCode.value = `do
+      } else if (newVal === "insertionSort") {
+        pseudoCode.value = `do
   swapped = false
   for index = 1 to index_of_last_unsorted_element - 1
     while left_element >= 0
@@ -147,14 +149,16 @@ while swapped`.split("\n");
         swap(left_element, right_element)
         swapped = true;
 while swapped`.split("\n");
-    } else if (selectedAlgorithm.value.label === "selectionSort") {
-      pseudoCode.value = `for index = 0 to index_of_last_unsorted_element - 1
+      } else if (newVal === "selectionSort") {
+        pseudoCode.value = `for index = 0 to index_of_last_unsorted_element - 1
     find smallest unsorted element
     swap(left_element, right_element)`.split("\n");
-    } else {
-      pseudoCode.value = [""]; // Reset if no algorithm is selected
-    }
-  });
+      } else {
+        pseudoCode.value = [""]; // Reset if no algorithm is selected
+      }
+    },
+    { immediate: true } // Trigger immediately to set initial state
+  );
 
   const updateLeftIndex = (index: number | null) => {
     currentLeftIndex.value = index;
